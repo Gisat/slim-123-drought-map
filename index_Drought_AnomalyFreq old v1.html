@@ -33,23 +33,12 @@
             max-width: 250px;     
         }
 
-        /* SHARED HEADER STYLE */
-        .legend-header, .layer-control-header {
+        .legend-header {
             padding: 10px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
-            background-color: #fff;
-            border-radius: 5px 5px 0 0; 
             font-size: 0.88em;
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header-collapsed {
-            border-radius: 5px !important;
-            border-bottom: none !important;
         }
 
         .legend-image {
@@ -63,29 +52,31 @@
         }
     
         /* --- SLIDER STYLES --- */
-        .slider-wrapper {
-            position: relative;
-            width: 155px; 
-            height: 14px; 
-            display: flex;
-            align-items: center;
-        }
-
         .custom-slider {
             -webkit-appearance: none;
             appearance: none;
             width: 100%; 
-            height: 2px; 
+            height: 8px;
             background: transparent;
             outline: none;
+            vertical-align: middle;
+            margin-top: 5px;
+            margin-bottom: 5px;
             cursor: pointer;
-            position: relative;
-            z-index: 3; 
-            margin: 0;
         }
 
-        .custom-slider::-webkit-slider-runnable-track { width: 100%; height: 2px; background: #a9d7ff; }
-        .custom-slider::-moz-range-track { width: 100%; height: 2px; background: #a9d7ff; }
+        .custom-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: #a9d7ff;
+        }
+        .custom-slider::-moz-range-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: #a9d7ff;
+        }
 
         .custom-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -93,6 +84,7 @@
             width: 10px;
             border-radius: 50%;
             background: #007bff;
+            cursor: pointer;
             margin-top: -4px;
             border: 1px solid #fff;
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
@@ -102,29 +94,12 @@
             width: 10px;
             border-radius: 50%;
             background: #007bff;
+            cursor: pointer;
             border: 1px solid #fff;
             box-shadow: 0 0 2px rgba(0,0,0,0.3);
         }
         
-        .slider-dots {
-            position: absolute;
-            left: 0;  
-            right: 0; 
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .dot {
-            width: 4px;
-            height: 4px;
-            background-color: #a9d7ff;
-            border-radius: 50%;
-            transform: translateY(0px); 
-        }
-        
+        /* Disabled state for sliders */
         .slider-disabled {
             opacity: 0.4;
             pointer-events: none;
@@ -132,36 +107,16 @@
             transition: opacity 0.3s ease;
         }
 
-        /* --- LAYER CONTROL OVERRIDES --- */
-        .leaflet-control-layers {
-            z-index: 1001 !important;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.4) !important;
-            border-radius: 5px !important;
-            padding: 0 !important; 
-            background: #fff;
-            width: fit-content; 
-        }
-
-        .leaflet-control-layers-list {
-            padding: 4px; 
-            overflow-y: auto;
-            max-height: 80vh;
-        }
-        
-        .layer-list-hidden {
-            display: none !important;
-        }
-
+        /* Tree Layout Tweaks */
         .leaflet-control-layers-tree {
             font-size: 12px;
-            min-width: 180px;
+            min-width: 230px;
         }
         
         .slider-row {
-            padding-left: 20px; 
+            padding-left: 20px;
             padding-right: 5px;
             margin-bottom: 5px;
-            box-sizing: border-box; 
         }
         
         .slider-label-text {
@@ -169,10 +124,18 @@
             color: #555;
             display: flex;
             justify-content: space-between;
-            width: 155px; 
         }
 
-        .active-value { font-weight: bold; color: #007bff; }
+        .active-value {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .leaflet-control-layers {
+            z-index: 1001 !important;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.4) !important;
+            border-radius: 5px !important;
+        }
         </style>
         <title></title>
     </head>
@@ -195,13 +158,12 @@
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
         <script src="data/AOIGreenNexus_5.js"></script>
-        <script src="data/Zambia.js"></script>
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:14, minZoom:3
         }).fitBounds([[-19.0,23.0],[-9.0,33.0]]);
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         
         function removeEmptyRowsFromPopupContent(content, feature) {
@@ -223,30 +185,47 @@
 			tempDiv.innerHTML = content;
 			if (tempDiv.querySelector('td img')) {
 				popup._contentNode.classList.add('media');
-					setTimeout(function() { popup.update(); }, 10);
+					setTimeout(function() {
+						popup.update();
+					}, 10);
 			} else {
 				popup._contentNode.classList.remove('media');
 			}
 		}
-        var zoomControl = L.control.zoom({ position: 'bottomright' }).addTo(map);
+        var zoomControl = L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
         var bounds_group = new L.featureGroup([]);
-        function setBounds() {}
+        function setBounds() {
+        }
         
         /* --- BASEMAPS --- */
         map.createPane('pane_GoogleEarth_0');
         map.getPane('pane_GoogleEarth_0').style.zIndex = 400;
         var layer_GoogleEarth_0 = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-            pane: 'pane_GoogleEarth_0', opacity: 0.95, minZoom: 3, maxZoom: 14
+            pane: 'pane_GoogleEarth_0',
+            opacity: 0.95,
+            attribution: '',
+            minZoom: 3,
+            maxZoom: 14,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
         });
         map.addLayer(layer_GoogleEarth_0);
 
         map.createPane('pane_OpenStreetMap_1');
         map.getPane('pane_OpenStreetMap_1').style.zIndex = 401;
         var layer_OpenStreetMap_1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            pane: 'pane_OpenStreetMap_1', opacity: 0.7, minZoom: 3, maxZoom: 14
+            pane: 'pane_OpenStreetMap_1',
+            opacity: 0.7,
+            attribution: '',
+            minZoom: 3,
+            maxZoom: 14,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
         });
         
-        /* --- DROUGHT LAYERS --- */
+        /* --- DROUGHT TIME SERIES (Annual) --- */
         map.createPane('pane_Drought');
         map.getPane('pane_Drought').style.zIndex = 402;
 
@@ -257,91 +236,112 @@
         for (var y = startYear; y <= endYear; y++) {
             var url = 'https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_' + y + '_v1/{z}/{x}/{y}.png';
             var layer = L.tileLayer(url, {
-                pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14
+                pane: 'pane_Drought',
+                opacity: 1.0,
+                minZoom: 3,
+                maxZoom: 14,
+                minNativeZoom: 3,
+                maxNativeZoom: 15
             });
             timeSeriesLayers.push({ year: y, layer: layer });
         }
         
+        /* --- DROUGHT ANOMALY TOTAL (2000-2024) --- */
         map.createPane('pane_DroughtAnomaly_Total');
         map.getPane('pane_DroughtAnomaly_Total').style.zIndex = 408;
         var layer_DroughtAnomaly_Total = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_2000_2024_v1/{z}/{x}/{y}.png', {
-            pane: 'pane_DroughtAnomaly_Total', opacity: 1.0, minZoom: 3, maxZoom: 14
+            pane: 'pane_DroughtAnomaly_Total',
+            opacity: 1.0,
+            minZoom: 3,
+            maxZoom: 14,
+            minNativeZoom: 3,
+            maxNativeZoom: 15
         });
         
-        /* --- AOI: GREEN NEXUS (DEFAULT HIDDEN) --- */
+        /* --- AOI --- */
         function pop_AOIGreenNexus_5(feature, layer) {
             var popupContent = '<table>\
-                    <tr><th scope="row">NAME</th><td class="visible-with-data" id="NAME">' + (feature.properties['NAME'] !== null ? autolinker.link(String(feature.properties['NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">PROVINCE</th><td class="visible-with-data" id="PROVINCE">' + (feature.properties['PROVINCE'] !== null ? autolinker.link(String(feature.properties['PROVINCE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
-                    <tr><th scope="row">PROVINCE_2</th><td class="visible-with-data" id="PROVINCE_2">' + (feature.properties['PROVINCE_2'] !== null ? autolinker.link(String(feature.properties['PROVINCE_2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                    <tr>\
+                        <th scope="row">NAME</th>\
+                        <td class="visible-with-data" id="NAME">' + (feature.properties['NAME'] !== null ? autolinker.link(String(feature.properties['NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">PROVINCE</th>\
+                        <td class="visible-with-data" id="PROVINCE">' + (feature.properties['PROVINCE'] !== null ? autolinker.link(String(feature.properties['PROVINCE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">PROVINCE_2</th>\
+                        <td class="visible-with-data" id="PROVINCE_2">' + (feature.properties['PROVINCE_2'] !== null ? autolinker.link(String(feature.properties['PROVINCE_2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) { addClassToPopupIfMedia(content, e.popup); });
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
 			layer.bindPopup(content, { maxHeight: 400 });
         }
-        function style_AOIGreenNexus_5_0() {
-            return { pane: 'pane_AOIGreenNexus_5', opacity: 1, color: 'rgba(168,0,0,1.0)', weight: 1.0, fill: true, fillOpacity: 1, fillColor: 'rgba(183,72,75,0.0)', interactive: false }
-        }
-        map.createPane('pane_AOIGreenNexus_5');
-        map.getPane('pane_AOIGreenNexus_5').style.zIndex = 409;
-        var layer_AOIGreenNexus_5 = new L.geoJson(json_AOIGreenNexus_5, {
-            attribution: '', interactive: false, pane: 'pane_AOIGreenNexus_5', onEachFeature: pop_AOIGreenNexus_5, style: style_AOIGreenNexus_5_0
-        });
-        bounds_group.addLayer(layer_AOIGreenNexus_5);
-        // REMOVED: map.addLayer(layer_AOIGreenNexus_5); to hide by default
 
-        /* --- ZAMBIA BORDER (DEFAULT VISIBLE) --- */
-        function style_Zambia() {
+        function style_AOIGreenNexus_5_0() {
             return {
-                pane: 'pane_AOIGreenNexus_5', 
+                pane: 'pane_AOIGreenNexus_5',
                 opacity: 1,
-                color: '#000000',             // BLACK
-                weight: 1.0,                  // WEIGHT 1.0
+                color: 'rgba(168,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
                 fill: true,
-                fillOpacity: 0,               // Transparent Fill
+                fillOpacity: 1,
+                fillColor: 'rgba(183,72,75,0.0)',
                 interactive: false,
             }
         }
-        
-        var layer_Zambia = new L.geoJson(json_Zambia, {
+        map.createPane('pane_AOIGreenNexus_5');
+        map.getPane('pane_AOIGreenNexus_5').style.zIndex = 409;
+        map.getPane('pane_AOIGreenNexus_5').style['mix-blend-mode'] = 'normal';
+        var layer_AOIGreenNexus_5 = new L.geoJson(json_AOIGreenNexus_5, {
             attribution: '',
             interactive: false,
+            dataVar: 'json_AOIGreenNexus_5',
+            layerName: 'layer_AOIGreenNexus_5',
             pane: 'pane_AOIGreenNexus_5',
-            style: style_Zambia
+            onEachFeature: pop_AOIGreenNexus_5,
+            style: style_AOIGreenNexus_5_0,
         });
-        bounds_group.addLayer(layer_Zambia);
-        map.addLayer(layer_Zambia); // Added to map = Visible by default
-
+        bounds_group.addLayer(layer_AOIGreenNexus_5);
+        map.addLayer(layer_AOIGreenNexus_5);
+        
+        /* --- DYNAMIC GROUP FOR TIME SERIES --- */
         var currentIndex = timeSeriesLayers.length - 1; 
         var defaultDroughtLayer = timeSeriesLayers[currentIndex].layer;
         var group_TimeSeries = L.layerGroup([defaultDroughtLayer]);
         map.addLayer(group_TimeSeries);
 
-        /* --- CONTROLS HTML --- */
+        /* --- HTML FOR CUSTOM CONTROLS IN LAYER TREE --- */
+        
+        // 1. Time Series Controls
         var maxIndex = timeSeriesLayers.length - 1;
-        var dotsHTML = '<div class="slider-dots">';
-        for(var i = 0; i <= maxIndex; i++) { dotsHTML += '<div class="dot"></div>'; }
-        dotsHTML += '</div>';
-
         var statusControlsHTML = 
-            'Drought Anomaly in <span id="year-tree-display" class="active-value">2024</span>' +
+            'Drought Anomaly <span id="year-tree-display" class="active-value">2024</span>' +
             '<div id="status-controls-wrapper">' + 
                 '<div class="slider-row">' +
                     '<div class="slider-label-text"><span style="font-weight: bold;">Year</span></div>' +
-                    '<div class="slider-wrapper">' + dotsHTML + '<input type="range" min="0" max="' + maxIndex + '" value="' + maxIndex + '" class="custom-slider" id="year-tree-slider"></div>' +
+                    '<input type="range" min="0" max="' + maxIndex + '" value="' + maxIndex + '" class="custom-slider" id="year-tree-slider">' +
                 '</div>' +
                 '<div class="slider-row">' +
                     '<div class="slider-label-text"><span>Transparency</span><span id="opacity-tree-display">100%</span></div>' +
-                    '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="opacity-tree-slider"></div>' +
+                    '<input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="opacity-tree-slider">' +
                 '</div>' +
             '</div>';
 
-        var aggLabel = 'Drought Anomaly 2000-2024<div id="flows-slider-wrapper" class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_DroughtAnomaly_Total"></div></div>';
-        var osmLabel = 'Open Street Map<div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1"></div></div>';
-        var googleLabel = 'Google Earth<div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="0.7" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0"></div></div>';
+        /* --- LAYER TREE CONFIG --- */
+        var aggLabel = 'Drought Anomaly 2000-2024<div id="flows-slider-wrapper" class="slider-row"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_DroughtAnomaly_Total"></div>';
+        
+        var osmLabel = 'Open Street Map<div class="slider-row"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1"></div>';
+        
+        var googleLabel = 'Google Earth<div class="slider-row"><input type="range" min="0" max="1" step="0.1" value="0.7" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0"></div>';
 
         var overlaysTree = [
-            {label: '<img src="legend/Zambia.png" /> Zambia border<div style="height: 5px;"></div>', layer: layer_Zambia},
             {label: '<img src="legend/AOIGreenNexus_5.png" /> AOI: Green Nexus<br><br>', layer: layer_AOIGreenNexus_5},
             {label: aggLabel, layer: layer_DroughtAnomaly_Total},
             {label: statusControlsHTML, layer: group_TimeSeries},
@@ -358,78 +358,90 @@
         </script>
         
         <script>
-            /* --- INJECT HEADER & COLLAPSE LOGIC --- */
-            setTimeout(function() {
-                var controlContainer = document.querySelector('.leaflet-control-layers');
-                var controlList = document.querySelector('.leaflet-control-layers-list');
-                
-                if (controlContainer && controlList) {
-                    var headerDiv = document.createElement('div');
-                    headerDiv.className = 'layer-control-header';
-                    headerDiv.innerHTML = 'Layers&nbsp;&nbsp;<i class="fa fa-caret-down"></i>';
-                    
-                    controlList.parentNode.insertBefore(headerDiv, controlList);
-                    
-                    headerDiv.addEventListener('click', function() {
-                        var icon = headerDiv.querySelector('i');
-                        if (controlList.classList.contains('layer-list-hidden')) {
-                            // Expand
-                            controlList.classList.remove('layer-list-hidden');
-                            headerDiv.classList.remove('header-collapsed');
-                            icon.className = 'fa fa-caret-down';
-                            controlContainer.style.width = 'fit-content'; 
-                        } else {
-                            // Collapse
-                            controlList.classList.add('layer-list-hidden');
-                            headerDiv.classList.add('header-collapsed');
-                            icon.className = 'fa fa-caret-right';
-                            controlContainer.style.width = 'fit-content';
-                        }
-                    });
-                }
-            }, 500);
-
-            /* --- SLIDER EVENTS --- */
+            /* --- EVENT DELEGATION --- */
             document.addEventListener('input', function(e) {
                 if (!e.target) return;
+
+                // Handle Year Slider
                 if (e.target.id === 'year-tree-slider') {
                     var index = parseInt(e.target.value);
-                    document.getElementById('year-tree-display').innerText = timeSeriesLayers[index].year;
+                    var display = document.getElementById('year-tree-display');
+                    var opSlider = document.getElementById('opacity-tree-slider');
+                    
+                    if (display) display.innerText = timeSeriesLayers[index].year;
+                    
                     group_TimeSeries.clearLayers();
                     var activeItem = timeSeriesLayers[index];
-                    activeItem.layer.setOpacity(document.getElementById('opacity-tree-slider').value);
+                    if (opSlider) activeItem.layer.setOpacity(opSlider.value);
                     group_TimeSeries.addLayer(activeItem.layer);
                     currentIndex = index;
-                    if (map.hasLayer(layer_DroughtAnomaly_Total)) map.removeLayer(layer_DroughtAnomaly_Total);
-                    if (!map.hasLayer(group_TimeSeries)) map.addLayer(group_TimeSeries);
+
+                    // Interaction -> FORCE TimeSeries ON, Aggregated OFF
+                    if (map.hasLayer(layer_DroughtAnomaly_Total)) {
+                        map.removeLayer(layer_DroughtAnomaly_Total);
+                    }
+                    if (!map.hasLayer(group_TimeSeries)) {
+                        map.addLayer(group_TimeSeries);
+                    }
                 }
+
+                // Handle TimeSeries Opacity
                 if (e.target.id === 'opacity-tree-slider') {
                     var val = e.target.value;
-                    document.getElementById('opacity-tree-display').innerText = Math.round(val * 100) + '%';
-                    timeSeriesLayers[currentIndex].layer.setOpacity(val);
+                    var opDisplay = document.getElementById('opacity-tree-display');
+                    if (opDisplay) opDisplay.innerText = Math.round(val * 100) + '%';
+                    
+                    var activeLayer = timeSeriesLayers[currentIndex].layer;
+                    if (activeLayer) activeLayer.setOpacity(val);
                 }
+
+                // Handle Generic Sliders (including the new Drought Anomaly Aggregated)
                 if (e.target.classList.contains('opacity-slider')) {
-                    window[e.target.getAttribute('data-layer')].setOpacity(e.target.value);
+                    var layerName = e.target.getAttribute('data-layer');
+                    var layer = window[layerName];
+                    if (layer && typeof layer.setOpacity === 'function') {
+                        layer.setOpacity(e.target.value);
+                    }
                 }
             });
 
-            document.addEventListener('mousedown', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
-            document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
+            document.addEventListener('mousedown', function(e) {
+                if (e.target && e.target.classList.contains('custom-slider')) {
+                    e.stopPropagation();
+                }
+            });
 
-            /* --- EXCLUSIVITY LOGIC --- */
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('custom-slider')) {
+                    e.stopPropagation();
+                }
+            });
+
+            /* --- MUTUAL EXCLUSIVITY & GREYING OUT LOGIC --- */
             map.on('overlayadd', function(e) {
+                // Fetch elements live
                 var statusWrapper = document.getElementById('status-controls-wrapper');
                 var flowsWrapper = document.getElementById('flows-slider-wrapper');
+
+                // 1. If Aggregated Layer added
                 if (e.layer === layer_DroughtAnomaly_Total) {
                     setTimeout(function() {
-                        if (map.hasLayer(group_TimeSeries)) map.removeLayer(group_TimeSeries);
+                        if (map.hasLayer(group_TimeSeries)) {
+                            map.removeLayer(group_TimeSeries);
+                        }
+                        // Aggregated ON -> TimeSeries Wrapper DISABLED
                         if(statusWrapper) statusWrapper.classList.add('slider-disabled');
                         if(flowsWrapper) flowsWrapper.classList.remove('slider-disabled');
                     }, 10);
                 }
+                
+                // 2. If TimeSeries Group added
                 if (e.layer === group_TimeSeries) {
                     setTimeout(function() {
-                        if (map.hasLayer(layer_DroughtAnomaly_Total)) map.removeLayer(layer_DroughtAnomaly_Total);
+                        if (map.hasLayer(layer_DroughtAnomaly_Total)) {
+                            map.removeLayer(layer_DroughtAnomaly_Total);
+                        }
+                        // TimeSeries ON -> Aggregated Wrapper DISABLED
                         if(statusWrapper) statusWrapper.classList.remove('slider-disabled');
                         if(flowsWrapper) flowsWrapper.classList.add('slider-disabled');
                     }, 10);
@@ -439,24 +451,44 @@
             map.on('overlayremove', function(e) {
                 var statusWrapper = document.getElementById('status-controls-wrapper');
                 var flowsWrapper = document.getElementById('flows-slider-wrapper');
-                if (e.layer === group_TimeSeries && statusWrapper) statusWrapper.classList.add('slider-disabled');
-                if (e.layer === layer_DroughtAnomaly_Total && flowsWrapper) flowsWrapper.classList.add('slider-disabled');
+
+                if (e.layer === group_TimeSeries) {
+                    // TimeSeries OFF -> Disable TimeSeries Sliders
+                    if(statusWrapper) statusWrapper.classList.add('slider-disabled');
+                }
+                if (e.layer === layer_DroughtAnomaly_Total) {
+                    // Aggregated OFF -> Disable Aggregated Slider
+                    if(flowsWrapper) flowsWrapper.classList.add('slider-disabled');
+                }
             });
             
+            // Initial Check on Load
             setTimeout(function() {
                  var statusWrapper = document.getElementById('status-controls-wrapper');
                  var flowsWrapper = document.getElementById('flows-slider-wrapper');
-                 if (!map.hasLayer(group_TimeSeries) && statusWrapper) statusWrapper.classList.add('slider-disabled');
-                 if (!map.hasLayer(layer_DroughtAnomaly_Total) && flowsWrapper) flowsWrapper.classList.add('slider-disabled');
+                 
+                 // If TimeSeries is OFF, disable its sliders
+                 if (!map.hasLayer(group_TimeSeries) && statusWrapper) {
+                     statusWrapper.classList.add('slider-disabled');
+                 }
+                 // If Aggregated is OFF, disable its slider
+                 if (!map.hasLayer(layer_DroughtAnomaly_Total) && flowsWrapper) {
+                     flowsWrapper.classList.add('slider-disabled');
+                 }
             }, 500);
 
             /* --- LEGEND TOGGLE --- */
     	    const legendHeader = document.querySelector('.legend-header');
     	    const legendImage = document.querySelector('.legend-image');
             const legendIcon = legendHeader.querySelector('i');
+
     	    legendHeader.addEventListener('click', function() {
                 legendImage.classList.toggle('hidden');
-                legendIcon.className = legendImage.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
+                if (legendImage.classList.contains('hidden')) {
+                    legendIcon.className = 'fa fa-caret-up';
+                } else {
+                    legendIcon.className = 'fa fa-caret-down';
+                }
     	    });
         </script>
     </body>
