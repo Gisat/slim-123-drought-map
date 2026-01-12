@@ -240,43 +240,51 @@
             position: relative;
             z-index: 3; 
             margin: 0;
+            /* Default CSS variables (Gray) */
+            --track-color: #6c757d;
+            --track-light: #e9ecef;
+            --value: 100%;
         }
 
+        /* Webkit Track */
         .custom-slider::-webkit-slider-runnable-track { 
-            width: 100%; height: 4px; background: #e9ecef; border-radius: 4px; 
+            width: 100%; 
+            height: 4px; 
+            border-radius: 4px; 
+            /* Gradient logic: Light color at 0% -> Dark color at [value]% -> Gray for remainder */
+            background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
         }
+        
+        /* Firefox Track */
         .custom-slider::-moz-range-track { 
-            width: 100%; height: 4px; background: #e9ecef; border-radius: 4px;
+            width: 100%; 
+            height: 4px; 
+            border-radius: 4px;
+            background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
         }
 
+        /* Thumbs */
         .custom-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             height: 18px; width: 18px;
             border-radius: 50%; background: #fff;
             margin-top: -7px;
-            border: 1px solid #ced4da;
+            border: 1px solid var(--track-color); /* Match border to track color */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: border-color 0.2s, transform 0.1s;
         }
+        
         .custom-slider::-moz-range-thumb {
             height: 18px; width: 18px;
             border-radius: 50%; background: #fff;
-            border: 1px solid #ced4da;
+            border: 1px solid var(--track-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: border-color 0.2s, transform 0.1s;
         }
+        
+        .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .custom-slider::-moz-range-thumb:hover { transform: scale(1.1); }
 
-        /* --- UPDATED SLIDERS --- */
-
-        /* Light Green to Dark Green */
-        #impact-opacity-slider::-webkit-slider-runnable-track {
-            background: linear-gradient(to right, #d4edda 0%, #28a745 var(--value, 100%), #e9ecef var(--value, 100%), #e9ecef 100%);
-        }
-        #impact-opacity-slider::-webkit-slider-thumb { border-color: #28a745; }
-
-        /* Light Blue to Dark Blue */
-        .blue-slider::-webkit-slider-runnable-track {
-            background: linear-gradient(to right, #cce5ff 0%, #007bff var(--value, 100%), #e9ecef var(--value, 100%), #e9ecef 100%);
-        }
-        .blue-slider::-webkit-slider-thumb { border-color: #007bff; }
 
         /* --- MISC --- */
         .fake-group-item {
@@ -349,16 +357,16 @@
          return tempDiv.innerHTML;
         }
         
-		function addClassToPopupIfMedia(content, popup) {
-			var tempDiv = document.createElement('div');
-			tempDiv.innerHTML = content;
-			if (tempDiv.querySelector('td img')) {
-				popup._contentNode.classList.add('media');
-					setTimeout(function() { popup.update(); }, 10);
-			} else {
-				popup._contentNode.classList.remove('media');
-			}
-		}
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            if (tempDiv.querySelector('td img')) {
+                popup._contentNode.classList.add('media');
+                    setTimeout(function() { popup.update(); }, 10);
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
         var zoomControl = L.control.zoom({ position: 'bottomright' }).addTo(map);
         var bounds_group = new L.featureGroup([]);
         function setBounds() {}
@@ -408,8 +416,8 @@
                     <tr><th scope="row">PROVINCE_2</th><td class="visible-with-data" id="PROVINCE_2">' + (feature.properties['PROVINCE_2'] !== null ? autolinker.link(String(feature.properties['PROVINCE_2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) { addClassToPopupIfMedia(content, e.popup); });
-			layer.bindPopup(content, { maxHeight: 400 });
+            layer.on('popupopen', function(e) { addClassToPopupIfMedia(content, e.popup); });
+            layer.bindPopup(content, { maxHeight: 400 });
         }
         function style_AOIGreenNexus_5_0() {
             return { pane: 'pane_AOIGreenNexus_5', opacity: 1, color: 'rgba(168,0,0,1.0)', weight: 1.0, fill: true, fillOpacity: 1, fillColor: 'rgba(183,72,75,0.0)', interactive: false }
@@ -444,16 +452,20 @@
         map.addLayer(layer_Zambia); 
 
         /* --- CONTROLS HTML STRINGS --- */
+        
+        // Define Colors
+        // Green (Drought): #28a745 / Light: #d4edda
+        // Blue (Basemaps): #007bff / Light: #cce5ff
 
         var impactSliderItem = 
             '<div class="slider-row tree-slider-item" style="margin-top:-20px; margin-bottom: 40px;">' +
                 '<div class="slider-label-text"><span>Transparency</span><span id="impact-opacity-display" class="active-value">100%</span></div>' +
-                '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="impact-opacity-slider" style="--value:100%"></div>' +
+                '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="impact-opacity-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;"></div>' +
             '</div>';
 
-        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider blue-slider" data-layer="layer_OpenStreetMap_1" style="--value:100%"></div></div>';
+        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
         
-        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider blue-slider" data-layer="layer_GoogleEarth_0" style="--value:100%"></div></div>';
+        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
 
         var overlaysTree = [
             // Header for Drought
@@ -601,13 +613,13 @@
             document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
 
             /* --- LEGEND TOGGLE --- */
-    	    const legendHeader = document.querySelector('.legend-header');
-    	    const legendImage = document.querySelector('.legend-image');
+            const legendHeader = document.querySelector('.legend-header');
+            const legendImage = document.querySelector('.legend-image');
             const legendIcon = legendHeader.querySelector('i');
-    	    legendHeader.addEventListener('click', function() {
+            legendHeader.addEventListener('click', function() {
                 legendImage.classList.toggle('hidden');
                 legendIcon.className = legendImage.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
-    	    });
+            });
         </script>
     </body>
 </html>
