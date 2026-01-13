@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* --- LEGEND STYLES --- */
+        .legend-container {
+            position: absolute;
+            bottom: 28px;
+            right: 55px;
+            z-index: 2000 !important;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-family: inherit;
+            width: auto;          
+            min-width: 150px;     
+            max-width: 250px;     
+        }
+
+        .legend-header {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            background-color: #fff;
+            border-radius: 8px 8px 0 0; 
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- HEADER FOR LAYER CONTROL --- */
+        .layer-control-header {
+            padding: 12px 10px 5px 10px; 
+            cursor: pointer;
+            background-color: transparent; 
+            border-bottom: none; 
+            border-radius: 8px 8px 0 0; 
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-collapsed {
+            border-radius: 8px !important;
+        }
+
+        .legend-image {
+            padding: 10px;
+            display: block;
+        }
+
+        .legend-image.hidden {
+            display: none;
+            padding: 0;
+        }
+    
+        /* --- LAYER CONTROL STYLES --- */
+        
+        .leaflet-control-layers {
+            z-index: 1001 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            background: #fff; 
+            border-radius: 8px !important;
+            border: none !important;
+            padding: 0 !important; 
+            
+            width: fit-content !important; 
+            min-width: auto; 
+            max-width: 350px;
+            
+            margin-bottom: 10px !important;
+        }
+
+        .leaflet-control-layers-list {
+            padding: 2px 10px 15px 8px; 
+            overflow-y: auto;
+            max-height: 60vh;
+            color: #444;
+        }
+
+        .leaflet-control-layers-tree {
+            font-size: 13px;
+        }
+
+        /* --- ROW LAYOUT --- */
+        .leaflet-control-layers label {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start; 
+            flex-wrap: wrap; 
+            margin-bottom: 8px; 
+            cursor: pointer;
+        }
+
+        /* TEXT Container */
+        .leaflet-control-layers-selector + span {
+            order: 2; 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column; 
+            width: auto; 
+        }
+
+        /* TOGGLE SWITCH (Input) */
+        .leaflet-control-layers-selector {
+            order: -1; 
+            appearance: none;
+            -webkit-appearance: none;
+            width: 36px;
+            min-width: 36px;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.3s;
+            margin-left: 0; 
+            margin-right: 12px; 
+            margin-top: 0; 
+            border: 1px solid #dee2e6;
+        }
+
+        .leaflet-control-layers-selector::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* DEFAULT GREEN (Drought) */
+        .leaflet-control-layers-selector:checked {
+            background: #28a745; 
+            border-color: #28a745;
+        }
+        
+        /* --- CUSTOM COLOR TOGGLES --- */
+        /* Blue (OSM / Google) */
+        .toggle-blue:checked {
+            background: #007bff !important; 
+            border-color: #007bff !important;
+        }
+        .toggle-blue:checked:hover { background-color: #0056b3 !important; }
+
+        /* Black (Zambia) */
+        .toggle-black:checked {
+            background: #000000 !important; 
+            border-color: #000000 !important;
+        }
+        .toggle-black:checked:hover { background-color: #333333 !important; }
+
+        /* Red (AOI) */
+        .toggle-red:checked {
+            background: #dc3545 !important; 
+            border-color: #dc3545 !important;
+        }
+        .toggle-red:checked:hover { background-color: #a71d2a !important; }
+
+
+        .leaflet-control-layers-selector:checked::after {
+            transform: translateX(16px);
+        }
+        .leaflet-control-layers-selector:hover { background-color: #dee2e6; }
+        .leaflet-control-layers-selector:checked:hover { background-color: #218838; }
+
+        /* --- SLIDER STYLING --- */
+        
+        .slider-row {
+            padding-left: 0; 
+            padding-right: 0;
+            margin-bottom: 5px;
+            margin-top: 2px; 
+            box-sizing: border-box; 
+            display: block;
+            flex-basis: 100%;
+        }
+
+	#status-controls-wrapper .slider-row:first-child {
+    		margin-bottom: 10px;
+	}
+
+        /* Adjust nested sliders */
+        .leaflet-control-layers-selector + span .slider-row {
+            margin-left: -48px; 
+            width: calc(100% + 48px); 
+        }
+        
+        .slider-label-text {
+            font-size: 12px;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+            width: 100%; 
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .active-value { font-weight: 600; color: #495057; }
+        
+        #year-tree-display {
+            color: #0c8f2b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            width: 100%; 
+            height: 6px; 
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%; 
+            height: 4px; 
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            z-index: 3; 
+            margin: 0;
+            /* Default CSS variables (Gray) */
+            --track-color: #6c757d;
+            --track-light: #e9ecef;
+            --value: 100%;
+        }
+
+        /* Webkit Track */
+        .custom-slider::-webkit-slider-runnable-track { 
+            width: 100%; 
+            height: 4px; 
+            border-radius: 4px; 
+            background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
+        }
+        
+        /* Firefox Track */
+        .custom-slider::-moz-range-track { 
+            width: 100%; 
+            height: 4px; 
+            border-radius: 4px;
+            background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
+        }
+
+        /* Thumbs */
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px; width: 18px;
+            border-radius: 50%; background: #fff;
+            margin-top: -7px;
+            border: 1px solid var(--track-color); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: border-color 0.2s, transform 0.1s;
+        }
+        
+        .custom-slider::-moz-range-thumb {
+            height: 18px; width: 18px;
+            border-radius: 50%; background: #fff;
+            border: 1px solid var(--track-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: border-color 0.2s, transform 0.1s;
+        }
+        
+        .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .custom-slider::-moz-range-thumb:hover { transform: scale(1.1); }
+
+        .slider-disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(100%);
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- MISC --- */
+        .fake-group-item {
+            padding-left: 0px;
+            font-size: 13px;
+            display: block; 
+            width: 100%;
+        }
+        
+        .layer-list-hidden { display: none !important; }
+
+        .leaflet-control-layers-group-label:has(.force-open-label) {
+            pointer-events: none; cursor: default;
+        }
+        
+        .group-title {
+            font-size: 13px; 
+            font-weight: 700; 
+            color: #333;
+            margin-top: 0px; 
+            margin-bottom: 8px;
+            display: block; 
+            white-space: nowrap;
+        }
+
+        .leaflet-control-layers-group-selector { display: none; }
+
+        /* --- DOTS ABOVE SLIDER --- */
+        #year-ticks {
+            position: absolute;
+            top: -2px;           /* Moves the dots upwards above the track */
+            left: 1px;            /* Slight offset to align with thumb center */
+            right: 1px;           /* Slight offset to align with thumb center */
+            height: 4px;
+            pointer-events: none; /* Let clicks pass through to the slider */
+            z-index: 1;
+            
+            /* Drawing the dots using gradients */
+            background-image: 
+                radial-gradient(circle, #adb5bd 1.5px, transparent 1.5px), /* Repeating dots */
+                radial-gradient(circle, #adb5bd 1.5px, transparent 1.5px); /* Final dot */
+            
+            /* Logic: 25 years = 24 intervals */
+            background-size: calc(100% / 24) 100%, 4px 100%;
+            background-position: 0 center, 100% center;
+            background-repeat: repeat-x, no-repeat;
+        }
+
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+            <div class="legend-container">
+                <div class="legend-header">Legend <i class="fa fa-caret-up"></i></div>
+                <img src="legend_Drought_AnomFreq.png" alt="Map Legend" class="legend-image hidden">
+            </div>
+        </div>
+
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/AOIGreenNexus_5.js"></script>
+        <script src="data/Zambia.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:14, minZoom:3
+        }).fitBounds([[-19.0,23.0],[-9.0,33.0]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					setTimeout(function() { popup.update(); }, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({ position: 'bottomright' }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {}
+        
+        /* --- BASEMAPS --- */
+        map.createPane('pane_GoogleEarth_0');
+        map.getPane('pane_GoogleEarth_0').style.zIndex = 400;
+        var layer_GoogleEarth_0 = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleEarth_0', opacity: 0.95, minZoom: 3, maxZoom: 14
+        });
+        map.addLayer(layer_GoogleEarth_0);
+
+        map.createPane('pane_OpenStreetMap_1');
+        map.getPane('pane_OpenStreetMap_1').style.zIndex = 401;
+        var layer_OpenStreetMap_1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OpenStreetMap_1', opacity: 0.7, minZoom: 3, maxZoom: 14
+        });
+        
+        /* --- DROUGHT LAYERS --- */
+        map.createPane('pane_Drought');
+        map.getPane('pane_Drought').style.zIndex = 402;
+
+        var timeSeriesLayers = [];
+        var startYear = 2000;
+        var endYear = 2024;
+
+        for (var y = startYear; y <= endYear; y++) {
+            var url = 'https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_' + y + '_v1/{z}/{x}/{y}.png';
+            var layer = L.tileLayer(url, {
+                pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14
+            });
+            timeSeriesLayers.push({ year: y, layer: layer });
+        }
+        
+        map.createPane('pane_DroughtAnomaly_Total');
+        map.getPane('pane_DroughtAnomaly_Total').style.zIndex = 408;
+        var layer_DroughtAnomaly_Total = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_2000_2024_v1/{z}/{x}/{y}.png', {
+            pane: 'pane_DroughtAnomaly_Total', opacity: 1.0, minZoom: 3, maxZoom: 14
+        });
+        
+        /* --- AOI: GREEN NEXUS --- */
+        function pop_AOIGreenNexus_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr><th scope="row">NAME</th><td class="visible-with-data" id="NAME">' + (feature.properties['NAME'] !== null ? autolinker.link(String(feature.properties['NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                    <tr><th scope="row">PROVINCE</th><td class="visible-with-data" id="PROVINCE">' + (feature.properties['PROVINCE'] !== null ? autolinker.link(String(feature.properties['PROVINCE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                    <tr><th scope="row">PROVINCE_2</th><td class="visible-with-data" id="PROVINCE_2">' + (feature.properties['PROVINCE_2'] !== null ? autolinker.link(String(feature.properties['PROVINCE_2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) { addClassToPopupIfMedia(content, e.popup); });
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+        function style_AOIGreenNexus_5_0() {
+            return { pane: 'pane_AOIGreenNexus_5', opacity: 1, color: 'rgba(168,0,0,1.0)', weight: 1.0, fill: true, fillOpacity: 1, fillColor: 'rgba(183,72,75,0.0)', interactive: false }
+        }
+        map.createPane('pane_AOIGreenNexus_5');
+        map.getPane('pane_AOIGreenNexus_5').style.zIndex = 409;
+        var layer_AOIGreenNexus_5 = new L.geoJson(json_AOIGreenNexus_5, {
+            attribution: '', interactive: false, pane: 'pane_AOIGreenNexus_5', onEachFeature: pop_AOIGreenNexus_5, style: style_AOIGreenNexus_5_0
+        });
+        bounds_group.addLayer(layer_AOIGreenNexus_5);
+
+        /* --- ZAMBIA BORDER --- */
+        function style_Zambia() {
+            return {
+                pane: 'pane_AOIGreenNexus_5', 
+                opacity: 1,
+                color: '#000000',             
+                weight: 1.0,                  
+                fill: true,
+                fillOpacity: 0,               
+                interactive: false,
+            }
+        }
+        
+        var layer_Zambia = new L.geoJson(json_Zambia, {
+            attribution: '',
+            interactive: false,
+            pane: 'pane_AOIGreenNexus_5',
+            style: style_Zambia
+        });
+        bounds_group.addLayer(layer_Zambia);
+        map.addLayer(layer_Zambia); 
+
+        var currentIndex = timeSeriesLayers.length - 1; 
+        var defaultDroughtLayer = timeSeriesLayers[currentIndex].layer;
+        var group_TimeSeries = L.layerGroup([defaultDroughtLayer]);
+        map.addLayer(group_TimeSeries);
+
+        /* --- CONTROLS HTML STRINGS --- */
+        var maxIndex = timeSeriesLayers.length - 1;
+
+        // NEW DESIGN: Updated Year Slider (Clean Gradient)
+        var statusControlsHTML = 
+            '<div id="status-controls-wrapper" style="margin-top: -22px; margin-bottom: 40px;">' + 
+                '<div class="slider-row">' +
+                    '<div class="slider-label-text"><span>Year</span><span id="year-tree-display" class="active-value">2024</span></div>' +
+                    '<div class="slider-wrapper">' + 
+                        // Insert this new line:
+                        '<div id="year-ticks"></div>' +
+                        
+                        '<input type="range" min="0" max="' + maxIndex + '" value="' + maxIndex + '" class="custom-slider" id="year-tree-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;">' + 
+                    '</div>' +
+                '</div>' +
+                '<div class="slider-row">' +
+                    '<div class="slider-label-text"><span>Transparency</span><span id="opacity-tree-display">100%</span></div>' +
+                    '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="opacity-tree-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;"></div>' +
+                '</div>' +
+            '</div>';
+
+        var aggLabel =
+            '<span class="fake-group-item" style="margin-bottom: 8px;">Drought Aggregate<br> 2000-2024</span>' +
+            '<div id="flows-slider-wrapper" style="margin-bottom: 20px;">' +
+                '<div class="slider-row">' +
+                    '<div class="slider-label-text"><span>Transparency</span><span class="active-value" id="opacity-total-display">100%</span></div>' +
+                    '<div class="slider-wrapper">' +
+                        '<input type="range" min="0" max="1" step="0.1" value="1.0" ' +
+                        'class="custom-slider opacity-slider" data-layer="layer_DroughtAnomaly_Total" ' +
+                        'style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;">' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+
+        
+        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        
+        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="0.95" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 95%;"></div></div>';
+
+        var overlaysTree = [
+            // Header for Drought
+            {
+                label: '<span class="group-title">Drought Anomaly Frequency</span>',
+                layer: null
+            },
+            
+            // --- ADD THIS EMPTY ROW ---
+            { label: '<div style="height: 8px;"></div>', layer: null }, 
+            // -----------------------------
+
+            // Total (Aggregated)
+            {label: aggLabel, layer: layer_DroughtAnomaly_Total, radioGroup: 'droughtAnom' },
+            
+            // Time Series (Group - mutually exclusive logic handled in JS)
+            {label: '<span class="fake-group-item">Drought Time Series</span>', layer: group_TimeSeries, radioGroup: 'droughtAnom' },
+            {label: statusControlsHTML, layer: null }, // Controls sit below
+
+            // Basemaps Middle
+            {label: osmLabel, layer: layer_OpenStreetMap_1, radioGroup: 'bm' },
+            {label: googleLabel, layer: layer_GoogleEarth_0, radioGroup: 'bm' },
+            
+            // Zambia & AOI Bottom
+            {label: 'Zambia border', layer: layer_Zambia},
+            {label: 'AOI: Green Nexus', layer: layer_AOIGreenNexus_5},
+        ];
+        
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            collapsed: false,
+            position: 'bottomright',
+        });
+        lay.addTo(map);
+
+        /* --- APPLY COLORS TO TOGGLES --- */
+        setTimeout(function() {
+            var labels = document.querySelectorAll('.leaflet-control-layers label');
+            labels.forEach(function(label) {
+                var text = label.textContent.trim();
+                var input = label.querySelector('input');
+                if (!input) return;
+
+                if (text.includes('Open Street Map') || text.includes('Google Earth')) {
+                    input.classList.add('toggle-blue');
+                } else if (text.includes('Zambia border')) {
+                    input.classList.add('toggle-black');
+                } else if (text.includes('AOI: Green Nexus')) {
+                    input.classList.add('toggle-red');
+                }
+            });
+        }, 500);
+
+        /* --- FORCE GROUP OPEN --- */
+        setTimeout(function () {
+            document.querySelectorAll('.leaflet-control-layers-group-label')
+                .forEach(function (label) {
+                    if (label.textContent.trim().includes('Drought Anomaly Frequency')) {
+                        var row = label.closest('.leaflet-layer-def');
+                        if (row) {
+                            row.classList.remove('leaflet-layer-def-closed');
+                            row.classList.add('leaflet-layer-def-open');
+                        }
+                        var arrow = label.querySelector('.leaflet-control-layers-group-selector');
+                        if (arrow) arrow.style.display = 'none';
+                        label.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            return false;
+                        }, true);
+                    }
+                });
+        }, 600);
+
+        setBounds();
+        </script>
+        
+        <script>
+            /* --- INJECT HEADER & COLLAPSE LOGIC --- */
+            setTimeout(function() {
+                var controlContainer = document.querySelector('.leaflet-control-layers');
+                var controlList = document.querySelector('.leaflet-control-layers-list');
+                
+                if (controlContainer && controlList) {
+                    var headerDiv = document.createElement('div');
+                    headerDiv.className = 'layer-control-header';
+                    headerDiv.innerHTML = 'Layers&nbsp;&nbsp;<i class="fa fa-caret-down"></i>';
+                    
+                    controlList.parentNode.insertBefore(headerDiv, controlList);
+                    
+                    headerDiv.addEventListener('click', function() {
+                        var icon = headerDiv.querySelector('i');
+                        if (controlList.classList.contains('layer-list-hidden')) {
+                            // Expand
+                            controlList.classList.remove('layer-list-hidden');
+                            headerDiv.classList.remove('header-collapsed');
+                            icon.className = 'fa fa-caret-down';
+                        } else {
+                            // Collapse
+                            controlList.classList.add('layer-list-hidden');
+                            headerDiv.classList.add('header-collapsed');
+                            icon.className = 'fa fa-caret-up';
+                        }
+                    });
+                }
+            }, 500);
+
+            /* --- SLIDER LOGIC --- */
+            function updateSliderFill(sliderInput) {
+                var value = (sliderInput.value - sliderInput.min) / (sliderInput.max - sliderInput.min) * 100;
+                sliderInput.style.setProperty('--value', value + '%');
+            }
+
+            document.addEventListener('input', function(e) {
+                if (!e.target) return;
+
+                // Year Slider
+                if (e.target.id === 'year-tree-slider') {
+                    var index = parseInt(e.target.value);
+                    document.getElementById('year-tree-display').innerText = timeSeriesLayers[index].year;
+                    
+                    updateSliderFill(e.target);
+
+                    group_TimeSeries.clearLayers();
+                    var activeItem = timeSeriesLayers[index];
+                    
+                    // Apply opacity from opacity slider
+                    var opVal = document.getElementById('opacity-tree-slider').value;
+                    activeItem.layer.setOpacity(opVal);
+                    
+                    group_TimeSeries.addLayer(activeItem.layer);
+                    currentIndex = index;
+
+                    // Ensure Time Series is active if slider is moved
+                    if (map.hasLayer(layer_DroughtAnomaly_Total)) {
+                        map.removeLayer(layer_DroughtAnomaly_Total);
+                        map.addLayer(group_TimeSeries);
+                        // Update radio buttons visually if needed (though mutually exclusive radio group handles state usually)
+                        // Trigger click on radio if not checked? Leaflet handles radioGroup automatically.
+                    }
+                    if (!map.hasLayer(group_TimeSeries)) map.addLayer(group_TimeSeries);
+                }
+
+                // Opacity Slider (Time Series)
+                if (e.target.id === 'opacity-tree-slider') {
+                    var val = e.target.value;
+                    document.getElementById('opacity-tree-display').innerText = Math.round(val * 100) + '%';
+                    updateSliderFill(e.target);
+                    timeSeriesLayers[currentIndex].layer.setOpacity(val);
+                }
+
+                // Generic Opacity Sliders
+                if (e.target.classList.contains('opacity-slider')) {
+                    updateSliderFill(e.target);
+                    window[e.target.getAttribute('data-layer')].setOpacity(e.target.value);
+
+                    if (e.target.getAttribute('data-layer') === 'layer_DroughtAnomaly_Total') {
+                        document.getElementById('opacity-total-display').innerText =
+                            Math.round(e.target.value * 100) + '%';
+                    }
+                }
+            });
+
+            document.addEventListener('mousedown', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
+            document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
+
+            /* --- EXCLUSIVITY LOGIC (Greying out controls) --- */
+            map.on('overlayadd', function(e) {
+                var statusWrapper = document.getElementById('status-controls-wrapper');
+                var flowsWrapper = document.getElementById('flows-slider-wrapper');
+                
+                if (e.layer === layer_DroughtAnomaly_Total) {
+                    setTimeout(function() {
+                        if (map.hasLayer(group_TimeSeries)) map.removeLayer(group_TimeSeries);
+                        if(statusWrapper) statusWrapper.classList.add('slider-disabled');
+                        if(flowsWrapper) flowsWrapper.classList.remove('slider-disabled');
+                    }, 10);
+                }
+                if (e.layer === group_TimeSeries) {
+                    setTimeout(function() {
+                        if (map.hasLayer(layer_DroughtAnomaly_Total)) map.removeLayer(layer_DroughtAnomaly_Total);
+                        if(statusWrapper) statusWrapper.classList.remove('slider-disabled');
+                        if(flowsWrapper) flowsWrapper.classList.add('slider-disabled');
+                    }, 10);
+                }
+            });
+
+            /* Initialize Exclusion State */
+            setTimeout(function() {
+                 var statusWrapper = document.getElementById('status-controls-wrapper');
+                 var flowsWrapper = document.getElementById('flows-slider-wrapper');
+                 
+                 // If Total is on, disable Series
+                 if (map.hasLayer(layer_DroughtAnomaly_Total)) {
+                     if(statusWrapper) statusWrapper.classList.add('slider-disabled');
+                     if(flowsWrapper) flowsWrapper.classList.remove('slider-disabled');
+                 } else {
+                     if(statusWrapper) statusWrapper.classList.remove('slider-disabled');
+                     if(flowsWrapper) flowsWrapper.classList.add('slider-disabled');
+                 }
+            }, 500);
+
+            /* --- LEGEND TOGGLE --- */
+    	    const legendHeader = document.querySelector('.legend-header');
+    	    const legendImage = document.querySelector('.legend-image');
+            const legendIcon = legendHeader.querySelector('i');
+    	    legendHeader.addEventListener('click', function() {
+                legendImage.classList.toggle('hidden');
+                legendIcon.className = legendImage.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
+    	    });
+        </script>
+    </body>
+</html>
