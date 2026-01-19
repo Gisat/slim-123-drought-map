@@ -19,19 +19,36 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        /* --- UNIFIED CONTROL STYLING --- */
+        /* Forces consistent border, rounding, and shadow across Legend, Layers, and Zoom */
+        .leaflet-control-layers,
+        .leaflet-bar,
+        .legend-control {
+            border: 2px solid rgba(0,0,0,0.2) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            background-color: #fff;
+            overflow: hidden; 
+            background-clip: padding-box;
+        }
+
+        /* Fix for Leaflet Zoom Buttons to respect container rounding */
+        .leaflet-touch .leaflet-bar a:first-child {
+            border-top-left-radius: 6px !important; 
+            border-top-right-radius: 6px !important;
+        }
+        .leaflet-touch .leaflet-bar a:last-child {
+            border-bottom-left-radius: 6px !important;
+            border-bottom-right-radius: 6px !important;
+        }
+
         /* --- LEGEND STYLES --- */
-        .legend-container {
-            position: absolute;
-            bottom: 28px;
-            right: 55px;
-            z-index: 2000 !important;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            font-family: inherit;
+        .legend-control {
             width: auto;          
             min-width: 150px;     
-            max-width: 250px;     
+            max-width: 250px;
+            margin-bottom: 10px !important; 
+            margin-right: 10px !important;
         }
 
         .legend-header {
@@ -39,7 +56,6 @@
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
             background-color: #fff;
-            border-radius: 8px 8px 0 0; 
             font-size: 14px;
             font-weight: 600;
             color: #333;
@@ -48,49 +64,42 @@
             align-items: center;
         }
 
-        /* --- HEADER FOR LAYER CONTROL --- */
-        .layer-control-header {
-            padding: 12px 10px 5px 10px; 
-            cursor: pointer;
-            background-color: transparent; 
-            border-bottom: none; 
-            border-radius: 8px 8px 0 0; 
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
+        /* Removes inner border when collapsed so the container border takes over */
         .header-collapsed {
-            border-radius: 8px !important;
+            border-bottom: none !important;
         }
 
         .legend-image {
             padding: 10px;
             display: block;
+            background: white;
+            max-width: 100%;
         }
 
         .legend-image.hidden {
             display: none;
             padding: 0;
         }
-    
+
         /* --- LAYER CONTROL STYLES --- */
-        
+        .layer-control-header {
+            padding: 12px 10px 5px 10px; 
+            cursor: pointer;
+            background-color: transparent; 
+            border-bottom: none; 
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .leaflet-control-layers {
-            z-index: 1001 !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-            background: #fff; 
-            border-radius: 8px !important;
-            border: none !important;
             padding: 0 !important; 
-            
             width: fit-content !important; 
             min-width: auto; 
             max-width: 350px;
-            
             margin-bottom: 10px !important;
         }
 
@@ -101,226 +110,113 @@
             color: #444;
         }
 
-        .leaflet-control-layers-tree {
-            font-size: 13px;
-        }
+        .leaflet-control-layers-tree { font-size: 13px; }
 
         /* --- ROW LAYOUT --- */
         .leaflet-control-layers label {
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start; 
-            flex-wrap: wrap; 
-            margin-bottom: 3px;  /* Tight spacing for items (Previous version) */
-            cursor: pointer;
+            display: flex; align-items: flex-start; justify-content: flex-start; 
+            flex-wrap: wrap; margin-bottom: 3px; cursor: pointer;
         }
 
-        /* TEXT Container */
         .leaflet-control-layers-selector + span {
-            order: 2; 
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column; 
-            width: auto; 
+            order: 2; flex-grow: 1; display: flex; flex-direction: column; width: auto; 
         }
 
         /* TOGGLE SWITCH (Input) */
         .leaflet-control-layers-selector {
-            order: -1; 
-            appearance: none;
-            -webkit-appearance: none;
-            width: 36px;
-            min-width: 36px;
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            outline: none;
+            order: -1; appearance: none; -webkit-appearance: none;
+            width: 36px; min-width: 36px; height: 20px;
+            background: #e9ecef; border-radius: 20px;
+            position: relative; cursor: pointer; outline: none;
             transition: background 0.3s;
-            margin-left: 0; 
-            margin-right: 12px; 
-            margin-top: 0; 
+            margin-left: 0; margin-right: 12px; margin-top: 0; 
             border: 1px solid #dee2e6;
         }
 
         .leaflet-control-layers-selector::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 14px;
-            height: 14px;
-            background: white;
-            border-radius: 50%;
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 14px; height: 14px; background: white; border-radius: 50%;
             transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* DEFAULT GREEN (Drought) */
-        .leaflet-control-layers-selector:checked {
-            background: #28a745; 
-            border-color: #28a745;
-        }
-        
-        /* --- CUSTOM COLOR TOGGLES --- */
-        /* Blue (OSM / Google) */
-        .toggle-blue:checked {
-            background: #007bff !important; 
-            border-color: #007bff !important;
-        }
-        .toggle-blue:checked:hover { background-color: #0056b3 !important; }
-
-        /* Black (Zambia) */
-        .toggle-black:checked {
-            background: #000000 !important; 
-            border-color: #000000 !important;
-        }
-        .toggle-black:checked:hover { background-color: #333333 !important; }
-
-        /* Red (AOI) */
-        .toggle-red:checked {
-            background: #dc3545 !important; 
-            border-color: #dc3545 !important;
-        }
-        .toggle-red:checked:hover { background-color: #a71d2a !important; }
-
-
-        .leaflet-control-layers-selector:checked::after {
-            transform: translateX(16px);
-        }
+        .leaflet-control-layers-selector:checked { background: #28a745; border-color: #28a745; }
+        .leaflet-control-layers-selector:checked::after { transform: translateX(16px); }
         .leaflet-control-layers-selector:hover { background-color: #dee2e6; }
         .leaflet-control-layers-selector:checked:hover { background-color: #218838; }
 
-        /* --- SLIDER STYLING --- */
-        
+        /* --- CUSTOM COLOR TOGGLES --- */
+        .toggle-blue:checked { background: #007bff !important; border-color: #007bff !important; }
+        .toggle-blue:checked:hover { background-color: #0056b3 !important; }
+
+        .toggle-black:checked { background: #000000 !important; border-color: #000000 !important; }
+        .toggle-black:checked:hover { background-color: #333333 !important; }
+
+        .toggle-red:checked { background: #dc3545 !important; border-color: #dc3545 !important; }
+        .toggle-red:checked:hover { background-color: #a71d2a !important; }
+
+        /* --- SLIDER STYLES --- */
         .slider-row {
-            padding-left: 0; 
-            padding-right: 0;
-            margin-bottom: 5px;
-            margin-top: 8px; 
-            box-sizing: border-box; 
-            display: block;
-            flex-basis: 100%;
+            padding-left: 0; padding-right: 0; margin-bottom: 5px; margin-top: 8px; 
+            box-sizing: border-box; display: block; flex-basis: 100%;
         }
 
         .leaflet-control-layers-selector + span .slider-row {
-            margin-left: -48px; 
-            width: calc(100% + 48px); 
+            margin-left: -48px; width: calc(100% + 48px); 
         }
         
         .slider-label-text {
-            font-size: 12px;
-            color: #6c757d;
-            display: flex;
-            justify-content: space-between;
-            width: 100%; 
-            margin-bottom: 5px;
-            font-weight: 500;
+            font-size: 12px; color: #6c757d; display: flex; 
+            justify-content: space-between; width: 100%; margin-bottom: 5px; font-weight: 500;
         }
-
         .active-value { font-weight: 600; color: #495057; }
         
-        .slider-wrapper {
-            position: relative;
-            width: 100%; 
-            height: 6px; 
-            display: flex;
-            align-items: center;
-        }
+        .slider-wrapper { position: relative; width: 100%; height: 6px; display: flex; align-items: center; }
 
         .custom-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%; 
-            height: 4px; 
-            background: transparent;
-            outline: none;
-            cursor: pointer;
-            position: relative;
-            z-index: 3; 
-            margin: 0;
-            /* Default CSS variables (Gray) */
-            --track-color: #6c757d;
-            --track-light: #e9ecef;
-            --value: 100%;
+            -webkit-appearance: none; appearance: none; width: 100%; height: 4px; 
+            background: transparent; outline: none; cursor: pointer; 
+            position: relative; z-index: 3; margin: 0;
+            --track-color: #6c757d; --track-light: #e9ecef; --value: 100%;
         }
 
-        /* Webkit Track */
         .custom-slider::-webkit-slider-runnable-track { 
-            width: 100%; 
-            height: 4px; 
-            border-radius: 4px; 
-            /* Gradient logic: Light color at 0% -> Dark color at [value]% -> Gray for remainder */
+            width: 100%; height: 4px; border-radius: 4px; 
             background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
         }
-        
-        /* Firefox Track */
         .custom-slider::-moz-range-track { 
-            width: 100%; 
-            height: 4px; 
-            border-radius: 4px;
+            width: 100%; height: 4px; border-radius: 4px;
             background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
         }
 
-        /* Thumbs */
         .custom-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 18px; width: 18px;
-            border-radius: 50%; background: #fff;
-            margin-top: -7px;
-            border: 1px solid var(--track-color); /* Match border to track color */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #fff; margin-top: -7px;
+            border: 1px solid var(--track-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: border-color 0.2s, transform 0.1s;
         }
-        
         .custom-slider::-moz-range-thumb {
-            height: 18px; width: 18px;
-            border-radius: 50%; background: #fff;
-            border: 1px solid var(--track-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 18px; width: 18px; border-radius: 50%; background: #fff;
+            border: 1px solid var(--track-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: border-color 0.2s, transform 0.1s;
         }
         
         .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
         .custom-slider::-moz-range-thumb:hover { transform: scale(1.1); }
 
-
         /* --- MISC --- */
-        .fake-group-item {
-            padding-left: 0px;
-            font-size: 13px;
-            display: block; 
-            width: 100%;
-        }
-        
+        .fake-group-item { padding-left: 0px; font-size: 13px; display: block; width: 100%; }
         .layer-list-hidden { display: none !important; }
-
-        .leaflet-control-layers-group-label:has(.force-open-label) {
-            pointer-events: none; cursor: default;
-        }
+        .leaflet-control-layers-group-label:has(.force-open-label) { pointer-events: none; cursor: default; }
         
         .group-title {
-            font-size: 13px; 
-            font-weight: 700; 
-            color: #333;
-            margin-top: 0px; 
-            margin-bottom: 8px; /* RESTORED GAP: 8px (Like Original) */
-            display: block; 
-            white-space: nowrap;
+            font-size: 13px; font-weight: 700; color: #333;
+            margin-top: 0px; margin-bottom: 8px; display: block; white-space: nowrap;
         }
 
-        /* Subtitles for Aggregated Map Sections */
         .group-subtitle {
-            font-size: 11px;
-            font-weight: 700;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: -18px;    /* TIGHT GAP for sections */
-            margin-bottom: 3px;
-            display: block;
-            pointer-events: none;
+            font-size: 11px; font-weight: 700; color: #999;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-top: -18px; margin-bottom: 3px; display: block; pointer-events: none;
         }
 
         .leaflet-control-layers-group-selector { display: none; }
@@ -330,11 +226,7 @@
     </head>
     <body>
         <div id="map">
-            <div class="legend-container">
-                <div class="legend-header">Legend <i class="fa fa-caret-up"></i></div>
-                <img src="legend_Drought_AggregMaps.png" alt="Map Legend" class="legend-image hidden">
             </div>
-        </div>
 
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -380,7 +272,10 @@
                 popup._contentNode.classList.remove('media');
             }
         }
+        
+        // 1. Zoom Control
         var zoomControl = L.control.zoom({ position: 'bottomright' }).addTo(map);
+        
         var bounds_group = new L.featureGroup([]);
         function setBounds() {}
         
@@ -489,9 +384,10 @@
                 '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="impact-opacity-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;"></div>' +
             '</div>';
 
-        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        // MODIFIED: Added margin-top: 15px to OSM and Google slider-row
+        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row" style="margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
         
-        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px; margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="0.95" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 95%;"></div></div>';
 
         var overlaysTree = [
             // Header for Drought
@@ -536,6 +432,36 @@
             position: 'bottomright', 
         });
         lay.addTo(map);
+
+        // --- NEW LEGEND CONTROL IMPLEMENTATION ---
+        var legendControl = L.control({ position: 'bottomright' });
+
+        legendControl.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'legend-control');
+            div.innerHTML = `
+                <div class="legend-header">Legend <i class="fa fa-caret-up"></i></div>
+                <img src="legend_Drought_AggregMaps.png" alt="Map Legend" class="legend-image hidden">
+            `;
+            
+            var header = div.querySelector('.legend-header');
+            var image = div.querySelector('.legend-image');
+            var icon = div.querySelector('i');
+            
+            L.DomEvent.disableClickPropagation(div);
+            
+            header.addEventListener('click', function() {
+                image.classList.toggle('hidden');
+                header.classList.toggle('header-collapsed');
+                if (image.classList.contains('hidden')) {
+                    icon.className = 'fa fa-caret-up'; 
+                } else {
+                    icon.className = 'fa fa-caret-down'; 
+                }
+            });
+            
+            return div;
+        };
+        legendControl.addTo(map);
 
         /* --- APPLY COLORS TO TOGGLES --- */
         setTimeout(function() {
@@ -671,14 +597,6 @@
             document.addEventListener('mousedown', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
             document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
 
-            /* --- LEGEND TOGGLE --- */
-            const legendHeader = document.querySelector('.legend-header');
-            const legendImage = document.querySelector('.legend-image');
-            const legendIcon = legendHeader.querySelector('i');
-            legendHeader.addEventListener('click', function() {
-                legendImage.classList.toggle('hidden');
-                legendIcon.className = legendImage.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
-            });
         </script>
     </body>
 </html>

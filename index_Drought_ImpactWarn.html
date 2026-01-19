@@ -19,19 +19,34 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        /* --- UNIFIED CONTROL STYLING --- */
+        .leaflet-control-layers,
+        .leaflet-bar,
+        .legend-control {
+            border: 2px solid rgba(0,0,0,0.2) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            background-color: #fff;
+            overflow: hidden; 
+            background-clip: padding-box;
+        }
+
+        .leaflet-touch .leaflet-bar a:first-child {
+            border-top-left-radius: 6px !important; 
+            border-top-right-radius: 6px !important;
+        }
+        .leaflet-touch .leaflet-bar a:last-child {
+            border-bottom-left-radius: 6px !important;
+            border-bottom-right-radius: 6px !important;
+        }
+
         /* --- LEGEND STYLES --- */
-        .legend-container {
-            position: absolute;
-            bottom: 28px;
-            right: 55px;
-            z-index: 2000 !important;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            font-family: inherit;
+        .legend-control {
             width: auto;          
             min-width: 150px;     
-            max-width: 250px;     
+            max-width: 250px;
+            margin-bottom: 10px !important; 
+            margin-right: 10px !important;
         }
 
         .legend-header {
@@ -39,7 +54,6 @@
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
             background-color: #fff;
-            border-radius: 8px 8px 0 0; 
             font-size: 14px;
             font-weight: 600;
             color: #333;
@@ -48,13 +62,17 @@
             align-items: center;
         }
 
-        /* --- HEADER FOR LAYER CONTROL --- */
+        .header-collapsed { border-bottom: none !important; }
+
+        .legend-image { padding: 10px; display: block; background: white; max-width: 100%; }
+        .legend-image.hidden { display: none; padding: 0; }
+
+        /* --- LAYER CONTROL STYLES --- */
         .layer-control-header {
             padding: 12px 10px 5px 10px; 
             cursor: pointer;
             background-color: transparent; 
             border-bottom: none; 
-            border-radius: 8px 8px 0 0; 
             font-size: 14px;
             font-weight: 600;
             color: #333;
@@ -62,35 +80,12 @@
             justify-content: space-between;
             align-items: center;
         }
-        
-        .header-collapsed {
-            border-radius: 8px !important;
-        }
 
-        .legend-image {
-            padding: 10px;
-            display: block;
-        }
-
-        .legend-image.hidden {
-            display: none;
-            padding: 0;
-        }
-    
-        /* --- LAYER CONTROL STYLES --- */
-        
         .leaflet-control-layers {
-            z-index: 1001 !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-            background: #fff; 
-            border-radius: 8px !important;
-            border: none !important;
             padding: 0 !important; 
-            
             width: fit-content !important; 
             min-width: auto; 
             max-width: 350px;
-            
             margin-bottom: 10px !important;
         }
 
@@ -101,215 +96,98 @@
             color: #444;
         }
 
-        .leaflet-control-layers-tree {
-            font-size: 13px;
-        }
+        .leaflet-control-layers-tree { font-size: 13px; }
 
-        /* --- ROW LAYOUT --- */
         .leaflet-control-layers label {
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start; 
-            flex-wrap: wrap; 
-            margin-bottom: 8px; 
-            cursor: pointer;
+            display: flex; align-items: flex-start; justify-content: flex-start; 
+            flex-wrap: wrap; margin-bottom: 8px; cursor: pointer;
         }
 
-        /* TEXT Container */
         .leaflet-control-layers-selector + span {
-            order: 2; 
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column; 
-            width: auto; 
+            order: 2; flex-grow: 1; display: flex; flex-direction: column; width: auto; 
         }
 
-        /* TOGGLE SWITCH (Input) */
         .leaflet-control-layers-selector {
-            order: -1; 
-            appearance: none;
-            -webkit-appearance: none;
-            width: 36px;
-            min-width: 36px;
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            outline: none;
+            order: -1; appearance: none; -webkit-appearance: none;
+            width: 36px; min-width: 36px; height: 20px;
+            background: #e9ecef; border-radius: 20px;
+            position: relative; cursor: pointer; outline: none;
             transition: background 0.3s;
-            margin-left: 0; 
-            margin-right: 12px; 
-            margin-top: 0; 
+            margin-left: 0; margin-right: 12px; margin-top: 0; 
             border: 1px solid #dee2e6;
         }
 
         .leaflet-control-layers-selector::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 14px;
-            height: 14px;
-            background: white;
-            border-radius: 50%;
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 14px; height: 14px; background: white; border-radius: 50%;
             transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* DEFAULT GREEN (Drought) */
-        .leaflet-control-layers-selector:checked {
-            background: #28a745; 
-            border-color: #28a745;
-        }
-        
-        /* --- CUSTOM COLOR TOGGLES --- */
-        /* Blue (OSM / Google) */
-        .toggle-blue:checked {
-            background: #007bff !important; 
-            border-color: #007bff !important;
-        }
-        .toggle-blue:checked:hover { background-color: #0056b3 !important; }
-
-        /* Black (Zambia) */
-        .toggle-black:checked {
-            background: #000000 !important; 
-            border-color: #000000 !important;
-        }
-        .toggle-black:checked:hover { background-color: #333333 !important; }
-
-        /* Red (AOI) */
-        .toggle-red:checked {
-            background: #dc3545 !important; 
-            border-color: #dc3545 !important;
-        }
-        .toggle-red:checked:hover { background-color: #a71d2a !important; }
-
-
-        .leaflet-control-layers-selector:checked::after {
-            transform: translateX(16px);
-        }
+        .leaflet-control-layers-selector:checked { background: #28a745; border-color: #28a745; }
+        .leaflet-control-layers-selector:checked::after { transform: translateX(16px); }
         .leaflet-control-layers-selector:hover { background-color: #dee2e6; }
         .leaflet-control-layers-selector:checked:hover { background-color: #218838; }
 
-        /* --- SLIDER STYLING --- */
-        
+        .toggle-blue:checked { background: #007bff !important; border-color: #007bff !important; }
+        .toggle-blue:checked:hover { background-color: #0056b3 !important; }
+
+        .toggle-black:checked { background: #000000 !important; border-color: #000000 !important; }
+        .toggle-black:checked:hover { background-color: #333333 !important; }
+
+        .toggle-red:checked { background: #dc3545 !important; border-color: #dc3545 !important; }
+        .toggle-red:checked:hover { background-color: #a71d2a !important; }
+
+        /* --- SLIDER STYLES --- */
         .slider-row {
-            padding-left: 0; 
-            padding-right: 0;
-            margin-bottom: 5px;
-            margin-top: 8px; 
-            box-sizing: border-box; 
-            display: block;
-            flex-basis: 100%;
+            padding-left: 0; padding-right: 0; margin-bottom: 5px; margin-top: 2px; 
+            box-sizing: border-box; display: block; flex-basis: 100%;
         }
 
-        .leaflet-control-layers-selector + span .slider-row {
-            margin-left: -48px; 
-            width: calc(100% + 48px); 
-        }
+        #impact-controls-wrapper .slider-row:first-child { margin-bottom: 10px; }
+        .leaflet-control-layers-selector + span .slider-row { margin-left: -48px; width: calc(100% + 48px); }
         
         .slider-label-text {
-            font-size: 12px;
-            color: #6c757d;
-            display: flex;
-            justify-content: space-between;
-            width: 100%; 
-            margin-bottom: 5px;
-            font-weight: 500;
+            font-size: 12px; color: #6c757d; display: flex; 
+            justify-content: space-between; width: 100%; margin-bottom: 5px; font-weight: 500;
         }
-
         .active-value { font-weight: 600; color: #495057; }
         
-        .slider-wrapper {
-            position: relative;
-            width: 100%; 
-            height: 6px; 
-            display: flex;
-            align-items: center;
-        }
+        .slider-wrapper { position: relative; width: 100%; height: 6px; display: flex; align-items: center; }
 
         .custom-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%; 
-            height: 4px; 
-            background: transparent;
-            outline: none;
-            cursor: pointer;
-            position: relative;
-            z-index: 3; 
-            margin: 0;
-            /* Default CSS variables (Gray) */
-            --track-color: #6c757d;
-            --track-light: #e9ecef;
-            --value: 100%;
+            -webkit-appearance: none; appearance: none; width: 100%; height: 4px; 
+            background: transparent; outline: none; cursor: pointer; 
+            position: relative; z-index: 3; margin: 0;
+            --track-color: #6c757d; --track-light: #e9ecef; --value: 100%;
         }
 
-        /* Webkit Track */
         .custom-slider::-webkit-slider-runnable-track { 
-            width: 100%; 
-            height: 4px; 
-            border-radius: 4px; 
-            /* Gradient logic: Light color at 0% -> Dark color at [value]% -> Gray for remainder */
+            width: 100%; height: 4px; border-radius: 4px; 
             background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
         }
-        
-        /* Firefox Track */
         .custom-slider::-moz-range-track { 
-            width: 100%; 
-            height: 4px; 
-            border-radius: 4px;
+            width: 100%; height: 4px; border-radius: 4px;
             background: linear-gradient(to right, var(--track-light) 0%, var(--track-color) var(--value), #e9ecef var(--value), #e9ecef 100%);
         }
 
-        /* Thumbs */
         .custom-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 18px; width: 18px;
-            border-radius: 50%; background: #fff;
-            margin-top: -7px;
-            border: 1px solid var(--track-color); /* Match border to track color */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #fff; margin-top: -7px;
+            border: 1px solid var(--track-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: border-color 0.2s, transform 0.1s;
         }
-        
         .custom-slider::-moz-range-thumb {
-            height: 18px; width: 18px;
-            border-radius: 50%; background: #fff;
-            border: 1px solid var(--track-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 18px; width: 18px; border-radius: 50%; background: #fff;
+            border: 1px solid var(--track-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: border-color 0.2s, transform 0.1s;
         }
         
         .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
         .custom-slider::-moz-range-thumb:hover { transform: scale(1.1); }
 
-
-        /* --- MISC --- */
-        .fake-group-item {
-            padding-left: 0px;
-            font-size: 13px;
-            display: block; 
-            width: 100%;
-        }
-        
         .layer-list-hidden { display: none !important; }
-
-        .leaflet-control-layers-group-label:has(.force-open-label) {
-            pointer-events: none; cursor: default;
-        }
-        
-        .group-title {
-            font-size: 13px; 
-            font-weight: 700; 
-            color: #333;
-            margin-top: 0px; 
-            margin-bottom: 8px;
-            display: block; 
-            white-space: nowrap;
-        }
-
+        .leaflet-control-layers-group-label:has(.force-open-label) { pointer-events: none; cursor: default; }
+        .group-title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 8px; display: block; white-space: nowrap; }
         .leaflet-control-layers-group-selector { display: none; }
 
         </style>
@@ -317,11 +195,7 @@
     </head>
     <body>
         <div id="map">
-            <div class="legend-container">
-                <div class="legend-header">Legend <i class="fa fa-caret-up"></i></div>
-                <img src="legend_Drought_ImpactWarning.png" alt="Map Legend" class="legend-image hidden">
             </div>
-        </div>
 
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -337,10 +211,11 @@
         <script src="data/Zambia.js"></script>
         <script>
         var map = L.map('map', {
-            zoomControl:false, maxZoom:14, minZoom:3
+            zoomControl:false, maxZoom:18, minZoom:3
         }).fitBounds([[-19.0,23.0],[-9.0,33.0]]);
+        
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com">Leaflet</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         
         function removeEmptyRowsFromPopupContent(content, feature) {
@@ -367,23 +242,25 @@
                 popup._contentNode.classList.remove('media');
             }
         }
+        
+        // 1. Zoom Control
         var zoomControl = L.control.zoom({ position: 'bottomright' }).addTo(map);
+        
         var bounds_group = new L.featureGroup([]);
         function setBounds() {}
         
         /* --- BASEMAPS --- */
         map.createPane('pane_GoogleEarth_0');
         map.getPane('pane_GoogleEarth_0').style.zIndex = 400;
-        
         var layer_GoogleEarth_0 = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-            pane: 'pane_GoogleEarth_0', opacity: 1.0, minZoom: 3, maxZoom: 14
+            pane: 'pane_GoogleEarth_0', opacity: 0.95, minZoom: 3, maxZoom: 18
         });
         map.addLayer(layer_GoogleEarth_0);
 
         map.createPane('pane_OpenStreetMap_1');
         map.getPane('pane_OpenStreetMap_1').style.zIndex = 401;
         var layer_OpenStreetMap_1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            pane: 'pane_OpenStreetMap_1', opacity: 0.7, minZoom: 3, maxZoom: 14
+            pane: 'pane_OpenStreetMap_1', opacity: 0.7, minZoom: 3, maxZoom: 18
         });
         
         /* --- IMPACT WARNING LAYERS --- */
@@ -391,24 +268,24 @@
         map.getPane('pane_Drought').style.zIndex = 402;
 
         var layer_AbsProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_ABS_v1/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
         var layer_AvgProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_LINT_2000_2024_REFMEAN_v1/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
         var layer_RelMean = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMEAN_v1/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
         var layer_RelMax = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMAX_v1/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
         map.addLayer(layer_AbsProd);
 
-        /* --- AOI: GREEN NEXUS --- */
+        /* --- AOI & BORDER --- */
         function pop_AOIGreenNexus_5(feature, layer) {
             var popupContent = '<table>\
                     <tr><th scope="row">NAME</th><td class="visible-with-data" id="NAME">' + (feature.properties['NAME'] !== null ? autolinker.link(String(feature.properties['NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td></tr>\
@@ -428,57 +305,37 @@
             attribution: '', interactive: false, pane: 'pane_AOIGreenNexus_5', onEachFeature: pop_AOIGreenNexus_5, style: style_AOIGreenNexus_5_0
         });
         bounds_group.addLayer(layer_AOIGreenNexus_5);
+        map.addLayer(layer_AOIGreenNexus_5); 
 
-        /* --- ZAMBIA BORDER --- */
         function style_Zambia() {
             return {
                 pane: 'pane_AOIGreenNexus_5', 
-                opacity: 1,
-                color: '#000000',             
-                weight: 1.0,                  
-                fill: true,
-                fillOpacity: 0,               
-                interactive: false,
+                opacity: 1, color: '#000000', weight: 1.0, fill: true, fillOpacity: 0, interactive: false,
             }
         }
-        
         var layer_Zambia = new L.geoJson(json_Zambia, {
-            attribution: '',
-            interactive: false,
-            pane: 'pane_AOIGreenNexus_5',
-            style: style_Zambia
+            attribution: '', interactive: false, pane: 'pane_AOIGreenNexus_5', style: style_Zambia
         });
         bounds_group.addLayer(layer_Zambia);
         map.addLayer(layer_Zambia); 
 
         /* --- CONTROLS HTML STRINGS --- */
-        
-        // Define Colors
-        // Green (Drought): #28a745 / Light: #d4edda
-        // Blue (Basemaps): #007bff / Light: #cce5ff
-
         var impactSliderItem = 
             '<div class="slider-row tree-slider-item" style="margin-top:-20px; margin-bottom: 40px;">' +
                 '<div class="slider-label-text"><span>Transparency</span><span id="impact-opacity-display" class="active-value">100%</span></div>' +
                 '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="impact-opacity-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;"></div>' +
             '</div>';
 
-        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row" style="margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
         
-        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px; margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="0.95" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 95%;"></div></div>';
 
         var overlaysTree = [
-            // Header for Drought
-            {
-                label: '<span class="group-title">Drought Impact Warning</span>',
-                layer: null
-            },
-
-            { label: '<span class="fake-group-item">Absolute Productivity</span>', layer: layer_AbsProd, radioGroup: 'impactWarn' },
-            { label: '<span class="fake-group-item">Long-Term Average</span>', layer: layer_AvgProd, radioGroup: 'impactWarn' },
-            { label: '<span class="fake-group-item">Relative to Average</span>', layer: layer_RelMean, radioGroup: 'impactWarn' },
-            { label: '<span class="fake-group-item">Relative to Maximum</span>', layer: layer_RelMax, radioGroup: 'impactWarn' },
-            { label: '<span class="fake-group-item">' + impactSliderItem + '</span>', layer: null },
+            { label: 'Absolute Productivity', layer: layer_AbsProd, radioGroup: 'impactWarn' },
+            { label: 'Long-Term Average', layer: layer_AvgProd, radioGroup: 'impactWarn' },
+            { label: 'Relative to Average', layer: layer_RelMean, radioGroup: 'impactWarn' },
+            { label: 'Relative to Maximum', layer: layer_RelMax, radioGroup: 'impactWarn' },
+            { label: impactSliderItem, layer: null },
 
             // Basemaps Middle
             {label: osmLabel, layer: layer_OpenStreetMap_1, radioGroup: 'bm' },
@@ -491,9 +348,39 @@
         
         var lay = L.control.layers.tree(null, overlaysTree,{
             collapsed: false,
-            position: 'bottomright', 
+            position: 'bottomright',
         });
         lay.addTo(map);
+
+        // 3. New Unified Legend Control
+        var legendControl = L.control({ position: 'bottomright' });
+
+        legendControl.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'legend-control');
+            div.innerHTML = `
+                <div class="legend-header">Legend <i class="fa fa-caret-up"></i></div>
+                <img src="legend_Drought_ImpactWarning.png" alt="Map Legend" class="legend-image hidden">
+            `;
+            
+            var header = div.querySelector('.legend-header');
+            var image = div.querySelector('.legend-image');
+            var icon = div.querySelector('i');
+            
+            L.DomEvent.disableClickPropagation(div);
+            
+            header.addEventListener('click', function() {
+                image.classList.toggle('hidden');
+                header.classList.toggle('header-collapsed');
+                if (image.classList.contains('hidden')) {
+                    icon.className = 'fa fa-caret-up'; 
+                } else {
+                    icon.className = 'fa fa-caret-down'; 
+                }
+            });
+            
+            return div;
+        };
+        legendControl.addTo(map);
 
         /* --- APPLY COLORS TO TOGGLES --- */
         setTimeout(function() {
@@ -513,34 +400,11 @@
             });
         }, 500);
 
-
-        /* --- FORCE DROUGHT IMPACT GROUP ALWAYS OPEN --- */
-        setTimeout(function () {
-            document.querySelectorAll('.leaflet-control-layers-group-label')
-                .forEach(function (label) {
-                    if (label.textContent.trim().includes('Drought Impact Warning')) {
-                        var row = label.closest('.leaflet-layer-def');
-                        if (row) {
-                            row.classList.remove('leaflet-layer-def-closed');
-                            row.classList.add('leaflet-layer-def-open');
-                        }
-                        var arrow = label.querySelector('.leaflet-control-layers-group-selector');
-                        if (arrow) arrow.style.display = 'none';
-                        label.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            e.stopImmediatePropagation();
-                            return false;
-                        }, true);
-                    }
-                });
-        }, 600);
-        </script>
-
         setBounds();
         </script>
         
         <script>
-            /* --- INJECT HEADER & COLLAPSE LOGIC --- */
+            /* --- INJECT HEADER & COLLAPSE LOGIC FOR LAYERS --- */
             setTimeout(function() {
                 var controlContainer = document.querySelector('.leaflet-control-layers');
                 var controlList = document.querySelector('.leaflet-control-layers-list');
@@ -568,34 +432,35 @@
                     });
                 }
             }, 500);
-
-
-            /* --- SLIDER EVENTS WITH FILL CALCULATION --- */
-            var impactLayers = [layer_AbsProd, layer_AvgProd, layer_RelMean, layer_RelMax];
-
+            
+            /* --- SLIDER LOGIC --- */
             function updateSliderFill(sliderInput) {
                 var value = (sliderInput.value - sliderInput.min) / (sliderInput.max - sliderInput.min) * 100;
                 sliderInput.style.setProperty('--value', value + '%');
             }
 
+            var impactLayers = [layer_AbsProd, layer_AvgProd, layer_RelMean, layer_RelMax];
+
             document.addEventListener('input', function(e) {
                 if (!e.target) return;
-                
-                // Impact Warning Opacity
+
+                // Shared Opacity Slider
                 if (e.target.id === 'impact-opacity-slider') {
                     var val = e.target.value;
                     document.getElementById('impact-opacity-display').innerText = Math.round(val * 100) + '%';
                     updateSliderFill(e.target);
                     
-                    impactLayers.forEach(function(l) {
-                        l.setOpacity(val);
+                    // Update opacity for all impact layers (only the active one will be visible anyway)
+                    impactLayers.forEach(function(layer) {
+                        layer.setOpacity(val);
                     });
                 }
-                
-                // Basemap Opacity
+
+                // Generic Opacity
                 if (e.target.classList.contains('opacity-slider')) {
                     updateSliderFill(e.target);
-                    window[e.target.getAttribute('data-layer')].setOpacity(e.target.value);
+                    var layer = window[e.target.getAttribute('data-layer')];
+                    if (layer) layer.setOpacity(e.target.value);
                 }
             });
 
@@ -612,14 +477,6 @@
             document.addEventListener('mousedown', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
             document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
 
-            /* --- LEGEND TOGGLE --- */
-            const legendHeader = document.querySelector('.legend-header');
-            const legendImage = document.querySelector('.legend-image');
-            const legendIcon = legendHeader.querySelector('i');
-            legendHeader.addEventListener('click', function() {
-                legendImage.classList.toggle('hidden');
-                legendIcon.className = legendImage.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
-            });
         </script>
     </body>
 </html>
