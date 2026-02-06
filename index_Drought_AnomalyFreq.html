@@ -288,7 +288,7 @@
         var endYear = 2024;
 
         for (var y = startYear; y <= endYear; y++) {
-            var url = 'https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_' + y + '_v1/{z}/{x}/{y}.png';
+            var url = 'https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_' + y + '_v1_clip/{z}/{x}/{y}.png';
             var layer = L.tileLayer(url, {
                 pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
             });
@@ -298,7 +298,7 @@
         /* --- AGGREGATE LAYER (CORRECTED URL) --- */
         map.createPane('pane_DroughtAnomaly_Total');
         map.getPane('pane_DroughtAnomaly_Total').style.zIndex = 408;
-        var layer_DroughtAnomaly_Total = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_2000_2024_v1/{z}/{x}/{y}.png', {
+        var layer_DroughtAnomaly_Total = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_AnomalyFreq_ZscoreRatio_2000_2024_v1_clip/{z}/{x}/{y}.png', {
             pane: 'pane_DroughtAnomaly_Total', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
         
