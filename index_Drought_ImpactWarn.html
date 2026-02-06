@@ -267,19 +267,19 @@
         map.createPane('pane_Drought');
         map.getPane('pane_Drought').style.zIndex = 402;
 
-        var layer_AbsProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_ABS_v1/{z}/{x}/{y}.png', {
+        var layer_AbsProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_ABS_v1_clip/{z}/{x}/{y}.png', {
             pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
-        var layer_AvgProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_LINT_2000_2024_REFMEAN_v1/{z}/{x}/{y}.png', {
+        var layer_AvgProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_LINT_2000_2024_REFMEAN_v1_clip/{z}/{x}/{y}.png', {
             pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
-        var layer_RelMean = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMEAN_v1/{z}/{x}/{y}.png', {
+        var layer_RelMean = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMEAN_v1_clip/{z}/{x}/{y}.png', {
             pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
-        var layer_RelMax = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMAX_v1/{z}/{x}/{y}.png', {
+        var layer_RelMax = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMAX_v1_clip/{z}/{x}/{y}.png', {
             pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
         });
 
