@@ -92,21 +92,28 @@
         .leaflet-control-layers-list {
             padding: 2px 10px 15px 8px; 
             overflow-y: auto;
-            max-height: 60vh;
+            max-height: 75vh;
             color: #444;
         }
 
         .leaflet-control-layers-tree { font-size: 13px; }
 
+        /* --- ROW LAYOUT --- */
         .leaflet-control-layers label {
-            display: flex; align-items: flex-start; justify-content: flex-start; 
-            flex-wrap: wrap; margin-bottom: 8px; cursor: pointer;
+            font-size: 13px !important; 
+            display: flex; 
+            align-items: flex-start; 
+            justify-content: flex-start; 
+            flex-wrap: nowrap; /* Prevents toggle wrap breaking */
+            margin-bottom: 6px; 
+            cursor: pointer;
         }
 
         .leaflet-control-layers-selector + span {
             order: 2; flex-grow: 1; display: flex; flex-direction: column; width: auto; 
         }
 
+        /* TOGGLE SWITCH (Input) */
         .leaflet-control-layers-selector {
             order: -1; appearance: none; -webkit-appearance: none;
             width: 36px; min-width: 36px; height: 20px;
@@ -129,6 +136,7 @@
         .leaflet-control-layers-selector:hover { background-color: #dee2e6; }
         .leaflet-control-layers-selector:checked:hover { background-color: #218838; }
 
+        /* --- CUSTOM COLOR TOGGLES --- */
         .toggle-blue:checked { background: #007bff !important; border-color: #007bff !important; }
         .toggle-blue:checked:hover { background-color: #0056b3 !important; }
 
@@ -140,19 +148,22 @@
 
         /* --- SLIDER STYLES --- */
         .slider-row {
-            padding-left: 0; padding-right: 0; margin-bottom: 5px; margin-top: 2px; 
+            padding-left: 0; padding-right: 0; margin-bottom: 5px; margin-top: 8px; 
             box-sizing: border-box; display: block; flex-basis: 100%;
         }
 
-        #impact-controls-wrapper .slider-row:first-child { margin-bottom: 10px; }
         .leaflet-control-layers-selector + span .slider-row { margin-left: -48px; width: calc(100% + 48px); }
         
         .slider-label-text {
-            font-size: 12px; color: #6c757d; display: flex; 
-            justify-content: space-between; width: 100%; margin-bottom: 5px; font-weight: 500;
+            font-size: 13px; color: #6c757d; display: flex; 
+            align-items: center; justify-content: space-between; 
+            width: 100%; margin-bottom: 5px; font-weight: 500;
         }
         .active-value { font-weight: 600; color: #495057; }
         
+        #impact-opacity-display { color: #0c8f2b; padding: 2px 6px; border-radius: 4px; }
+        #unified-bm-display { color: #007bff; padding: 2px 6px; border-radius: 4px; }
+
         .slider-wrapper { position: relative; width: 100%; height: 6px; display: flex; align-items: center; }
 
         .custom-slider {
@@ -185,17 +196,35 @@
         .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
         .custom-slider::-moz-range-thumb:hover { transform: scale(1.1); }
 
+        /* --- MISC --- */
+        .fake-group-item { padding-left: 0px; font-size: 13px; display: block; width: 100%; }
         .layer-list-hidden { display: none !important; }
         .leaflet-control-layers-group-label:has(.force-open-label) { pointer-events: none; cursor: default; }
-        .group-title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 8px; display: block; white-space: nowrap; }
+        
+        .group-title { font-size: 13px; font-weight: 700; color: #333; margin-top: 0px; margin-bottom: 8px; display: block; white-space: nowrap; }
         .leaflet-control-layers-group-selector { display: none; }
+        
+        .section-divider {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* --- RESPONSIVE SCALING FOR 14" LAPTOPS --- */
+        @media (max-height: 850px) {
+            .leaflet-control-layers-list { max-height: 88vh; }
+            .leaflet-control-layers label { font-size: 11.5px !important; margin-bottom: 3px; }
+            .group-title { font-size: 12px; margin-bottom: 4px; }
+            .fake-group-item { font-size: 11.5px; }
+            .slider-label-text { font-size: 11.5px; margin-bottom: 2px; }
+            .section-divider { margin-bottom: 8px !important; padding-bottom: 8px !important; }
+        }
 
         </style>
         <title></title>
     </head>
     <body>
-        <div id="map">
-            </div>
+        <div id="map"></div>
 
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -210,8 +239,9 @@
         <script src="data/AOIGreenNexus_5.js"></script>
         <script src="data/Zambia.js"></script>
         <script>
+        // Set hard limit maxZoom: 14
         var map = L.map('map', {
-            zoomControl:false, maxZoom:18, minZoom:3
+            zoomControl:false, maxZoom:14, minZoom:3
         }).fitBounds([[-19.0,23.0],[-9.0,33.0]]);
         
         var hash = new L.Hash(map);
@@ -253,14 +283,14 @@
         map.createPane('pane_GoogleEarth_0');
         map.getPane('pane_GoogleEarth_0').style.zIndex = 400;
         var layer_GoogleEarth_0 = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-            pane: 'pane_GoogleEarth_0', opacity: 0.95, minZoom: 3, maxZoom: 18
+            pane: 'pane_GoogleEarth_0', opacity: 1.0, minZoom: 3, maxZoom: 14
         });
         map.addLayer(layer_GoogleEarth_0);
 
         map.createPane('pane_OpenStreetMap_1');
         map.getPane('pane_OpenStreetMap_1').style.zIndex = 401;
         var layer_OpenStreetMap_1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            pane: 'pane_OpenStreetMap_1', opacity: 0.7, minZoom: 3, maxZoom: 18
+            pane: 'pane_OpenStreetMap_1', opacity: 1.0, minZoom: 3, maxZoom: 14
         });
         
         /* --- IMPACT WARNING LAYERS --- */
@@ -268,19 +298,19 @@
         map.getPane('pane_Drought').style.zIndex = 402;
 
         var layer_AbsProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_ABS_v1_clip/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14, maxNativeZoom: 14
         });
 
         var layer_AvgProd = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_LINT_2000_2024_REFMEAN_v1_clip/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14, maxNativeZoom: 14
         });
 
         var layer_RelMean = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMEAN_v1_clip/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14, maxNativeZoom: 14
         });
 
         var layer_RelMax = L.tileLayer('https://eu-central-1.linodeobjects.com/gisat-data/SLIM_GST-239/project/data/XYZ/XYZ_Drought_ImpactWarning_PREDLINT_RELMAX_v1_clip/{z}/{x}/{y}.png', {
-            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 18, maxNativeZoom: 14
+            pane: 'pane_Drought', opacity: 1.0, minZoom: 3, maxZoom: 14, maxNativeZoom: 14
         });
 
         map.addLayer(layer_AbsProd);
@@ -320,22 +350,33 @@
         map.addLayer(layer_Zambia); 
 
         /* --- CONTROLS HTML STRINGS --- */
+        
         var impactSliderItem = 
-            '<div class="slider-row tree-slider-item" style="margin-top:-20px; margin-bottom: 40px;">' +
-                '<div class="slider-label-text"><span>Transparency</span><span id="impact-opacity-display" class="active-value">100%</span></div>' +
+            '<div class="slider-row tree-slider-item section-divider" style="margin-top:-10px;">' +
+                '<div class="slider-label-text"><span>Opacity</span><span id="impact-opacity-display" class="active-value">100%</span></div>' +
                 '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="impact-opacity-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;"></div>' +
             '</div>';
 
-        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row" style="margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        var osmLabel = 'Open Street Map';
         
-        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px; margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="0.95" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 95%;"></div></div>';
+        var unifiedBMOpacityUI = 
+            '<div style="width: 100%;">' +
+                '<div class="slider-row section-divider" style="margin-top: 6px;">' +
+                    '<div class="slider-label-text"><span>Basemap Opacity</span><span id="unified-bm-display" class="active-value">100%</span></div>' +
+                    '<div class="slider-wrapper">' +
+                        '<input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" id="unified-bm-slider" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;">' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+            
+        var googleLabel = 'Google Earth' + unifiedBMOpacityUI;
 
         var overlaysTree = [
             { label: 'Absolute Productivity', layer: layer_AbsProd, radioGroup: 'impactWarn' },
             { label: 'Long-Term Average', layer: layer_AvgProd, radioGroup: 'impactWarn' },
             { label: 'Relative to Average', layer: layer_RelMean, radioGroup: 'impactWarn' },
             { label: 'Relative to Maximum', layer: layer_RelMax, radioGroup: 'impactWarn' },
-            { label: impactSliderItem, layer: null },
+            { label: '<span class="fake-group-item">' + impactSliderItem + '</span>', layer: null },
 
             // Basemaps Middle
             {label: osmLabel, layer: layer_OpenStreetMap_1, radioGroup: 'bm' },
@@ -352,7 +393,7 @@
         });
         lay.addTo(map);
 
-        // 3. New Unified Legend Control
+        // --- NEW LEGEND CONTROL IMPLEMENTATION (With Accordion Logic) ---
         var legendControl = L.control({ position: 'bottomright' });
 
         legendControl.onAdd = function (map) {
@@ -363,18 +404,26 @@
             `;
             
             var header = div.querySelector('.legend-header');
-            var image = div.querySelector('.legend-image');
-            var icon = div.querySelector('i');
             
             L.DomEvent.disableClickPropagation(div);
             
             header.addEventListener('click', function() {
+                var image = div.querySelector('.legend-image');
+                var icon = div.querySelector('i');
+                var isOpening = image.classList.contains('hidden');
+
                 image.classList.toggle('hidden');
                 header.classList.toggle('header-collapsed');
-                if (image.classList.contains('hidden')) {
-                    icon.className = 'fa fa-caret-up'; 
-                } else {
-                    icon.className = 'fa fa-caret-down'; 
+                icon.className = image.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
+
+                // Accordion Logic: Close Layers panel when expanding Legend
+                if (isOpening) {
+                    var layerList = document.querySelector('.leaflet-control-layers-list');
+                    var layerIcon = document.querySelector('.layer-control-header i');
+                    if (layerList && !layerList.classList.contains('layer-list-hidden')) {
+                        layerList.classList.add('layer-list-hidden');
+                        if (layerIcon) layerIcon.className = 'fa fa-caret-up';
+                    }
                 }
             });
             
@@ -417,17 +466,22 @@
                     controlList.parentNode.insertBefore(headerDiv, controlList);
                     
                     headerDiv.addEventListener('click', function() {
+                        var isOpening = controlList.classList.contains('layer-list-hidden');
                         var icon = headerDiv.querySelector('i');
-                        if (controlList.classList.contains('layer-list-hidden')) {
-                            // Expand
-                            controlList.classList.remove('layer-list-hidden');
-                            headerDiv.classList.remove('header-collapsed');
-                            icon.className = 'fa fa-caret-down';
-                        } else {
-                            // Collapse
-                            controlList.classList.add('layer-list-hidden');
-                            headerDiv.classList.add('header-collapsed');
-                            icon.className = 'fa fa-caret-up';
+                        
+                        controlList.classList.toggle('layer-list-hidden');
+                        icon.className = controlList.classList.contains('layer-list-hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
+
+                        // Accordion Logic: Close Legend when expanding Layers panel
+                        if (isOpening) {
+                            var legImg = document.querySelector('.legend-image');
+                            var legHdr = document.querySelector('.legend-header');
+                            var legIcon = document.querySelector('.legend-header i');
+                            if (legImg && !legImg.classList.contains('hidden')) {
+                                legImg.classList.add('hidden');
+                                if (legHdr) legHdr.classList.add('header-collapsed');
+                                if (legIcon) legIcon.className = 'fa fa-caret-up';
+                            }
                         }
                     });
                 }
@@ -442,7 +496,7 @@
             var impactLayers = [layer_AbsProd, layer_AvgProd, layer_RelMean, layer_RelMax];
 
             document.addEventListener('input', function(e) {
-                if (!e.target) return;
+                if (!e.target || !e.target.classList.contains('custom-slider')) return;
 
                 // Shared Opacity Slider
                 if (e.target.id === 'impact-opacity-slider') {
@@ -456,11 +510,12 @@
                     });
                 }
 
-                // Generic Opacity
-                if (e.target.classList.contains('opacity-slider')) {
+                // Unified Basemap Opacity
+                if (e.target.id === 'unified-bm-slider') {
                     updateSliderFill(e.target);
-                    var layer = window[e.target.getAttribute('data-layer')];
-                    if (layer) layer.setOpacity(e.target.value);
+                    document.getElementById('unified-bm-display').innerText = Math.round(e.target.value * 100) + '%';
+                    layer_GoogleEarth_0.setOpacity(e.target.value);
+                    layer_OpenStreetMap_1.setOpacity(e.target.value);
                 }
             });
 

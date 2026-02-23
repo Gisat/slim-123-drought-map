@@ -20,7 +20,6 @@
         }
 
         /* --- UNIFIED CONTROL STYLING --- */
-        /* Forces consistent border, rounding, and shadow across Legend, Layers, and Zoom */
         .leaflet-control-layers,
         .leaflet-bar,
         .legend-control {
@@ -32,15 +31,8 @@
             background-clip: padding-box;
         }
 
-        /* Fix for Leaflet Zoom Buttons to respect container rounding */
-        .leaflet-touch .leaflet-bar a:first-child {
-            border-top-left-radius: 6px !important; 
-            border-top-right-radius: 6px !important;
-        }
-        .leaflet-touch .leaflet-bar a:last-child {
-            border-bottom-left-radius: 6px !important;
-            border-bottom-right-radius: 6px !important;
-        }
+        .leaflet-touch .leaflet-bar a:first-child { border-top-left-radius: 6px !important; border-top-right-radius: 6px !important; }
+        .leaflet-touch .leaflet-bar a:last-child { border-bottom-left-radius: 6px !important; border-bottom-right-radius: 6px !important; }
 
         /* --- LEGEND STYLES --- */
         .legend-control {
@@ -64,22 +56,10 @@
             align-items: center;
         }
 
-        /* Removes inner border when collapsed so the container border takes over */
-        .header-collapsed {
-            border-bottom: none !important;
-        }
+        .header-collapsed { border-bottom: none !important; }
 
-        .legend-image {
-            padding: 10px;
-            display: block;
-            background: white;
-            max-width: 100%;
-        }
-
-        .legend-image.hidden {
-            display: none;
-            padding: 0;
-        }
+        .legend-image { padding: 10px; display: block; background: white; max-width: 100%; }
+        .legend-image.hidden { display: none; padding: 0; }
 
         /* --- LAYER CONTROL STYLES --- */
         .layer-control-header {
@@ -106,7 +86,7 @@
         .leaflet-control-layers-list {
             padding: 2px 10px 15px 8px; 
             overflow-y: auto;
-            max-height: 56vh;
+            max-height: 75vh;
             color: #444;
         }
 
@@ -114,8 +94,13 @@
 
         /* --- ROW LAYOUT --- */
         .leaflet-control-layers label {
-            display: flex; align-items: flex-start; justify-content: flex-start; 
-            flex-wrap: wrap; margin-bottom: 3px; cursor: pointer;
+            font-size: 13px !important; 
+            display: flex; 
+            align-items: flex-start; 
+            justify-content: flex-start; 
+            flex-wrap: nowrap; /* Prevents toggle wrap breaking */
+            margin-bottom: 6px; 
+            cursor: pointer;
         }
 
         .leaflet-control-layers-selector + span {
@@ -161,16 +146,18 @@
             box-sizing: border-box; display: block; flex-basis: 100%;
         }
 
-        .leaflet-control-layers-selector + span .slider-row {
-            margin-left: -48px; width: calc(100% + 48px); 
-        }
+        .leaflet-control-layers-selector + span .slider-row { margin-left: -48px; width: calc(100% + 48px); }
         
         .slider-label-text {
-            font-size: 12px; color: #6c757d; display: flex; 
-            justify-content: space-between; width: 100%; margin-bottom: 5px; font-weight: 500;
+            font-size: 13px; color: #6c757d; display: flex; 
+            align-items: center; justify-content: space-between; 
+            width: 100%; margin-bottom: 5px; font-weight: 500;
         }
         .active-value { font-weight: 600; color: #495057; }
         
+        #impact-opacity-display { color: #0c8f2b; padding: 2px 6px; border-radius: 4px; }
+        #unified-bm-display { color: #007bff; padding: 2px 6px; border-radius: 4px; }
+
         .slider-wrapper { position: relative; width: 100%; height: 6px; display: flex; align-items: center; }
 
         .custom-slider {
@@ -220,13 +207,29 @@
         }
 
         .leaflet-control-layers-group-selector { display: none; }
+        
+        .section-divider {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* --- RESPONSIVE SCALING FOR 14" LAPTOPS --- */
+        @media (max-height: 850px) {
+            .leaflet-control-layers-list { max-height: 88vh; }
+            .leaflet-control-layers label { font-size: 11.5px !important; margin-bottom: 3px; }
+            .group-title { font-size: 12px; margin-bottom: 4px; }
+            .group-subtitle { font-size: 10px; margin-top: -14px; margin-bottom: 2px; }
+            .fake-group-item { font-size: 11.5px; }
+            .slider-label-text { font-size: 11.5px; margin-bottom: 2px; }
+            .section-divider { margin-bottom: 8px !important; padding-bottom: 8px !important; }
+        }
 
         </style>
         <title></title>
     </head>
     <body>
-        <div id="map">
-            </div>
+        <div id="map"></div>
 
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
@@ -273,7 +276,6 @@
             }
         }
         
-        // 1. Zoom Control
         var zoomControl = L.control.zoom({ position: 'bottomright' }).addTo(map);
         
         var bounds_group = new L.featureGroup([]);
@@ -291,7 +293,7 @@
         map.createPane('pane_OpenStreetMap_1');
         map.getPane('pane_OpenStreetMap_1').style.zIndex = 401;
         var layer_OpenStreetMap_1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            pane: 'pane_OpenStreetMap_1', opacity: 0.7, minZoom: 3, maxZoom: 14
+            pane: 'pane_OpenStreetMap_1', opacity: 1.0, minZoom: 3, maxZoom: 14
         });
         
         /* --- AGGREGATED DROUGHT MAPS --- */
@@ -379,15 +381,24 @@
         /* --- CONTROLS HTML STRINGS --- */
         
         var impactSliderItem = 
-            '<div class="slider-row tree-slider-item" style="margin-top:-10px; margin-bottom: 30px;">' +
-                '<div class="slider-label-text"><span>Transparency</span><span id="impact-opacity-display" class="active-value">100%</span></div>' +
+            '<div class="slider-row tree-slider-item section-divider" style="margin-top: -10px;">' +
+                '<div class="slider-label-text"><span>Opacity</span><span id="impact-opacity-display" class="active-value">100%</span></div>' +
                 '<div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider" id="impact-opacity-slider" style="--track-color: #28a745; --track-light: #d4edda; --value: 100%;"></div>' +
             '</div>';
 
-        // MODIFIED: Added margin-top: 15px to OSM and Google slider-row
-        var osmLabel = '<span class="layer-name">Open Street Map</span><div class="slider-row" style="margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" data-layer="layer_OpenStreetMap_1" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;"></div></div>';
+        var osmLabel = 'Open Street Map';
         
-        var googleLabel = '<span class="layer-name">Google Earth</span><div class="slider-row" style="margin-bottom: 30px; margin-top: 15px;"><div class="slider-wrapper"><input type="range" min="0" max="1" step="0.1" value="0.95" class="custom-slider opacity-slider" data-layer="layer_GoogleEarth_0" style="--track-color: #007bff; --track-light: #cce5ff; --value: 95%;"></div></div>';
+        var unifiedBMOpacityUI = 
+            '<div style="width: 100%;">' +
+                '<div class="slider-row section-divider" style="margin-top: 6px;">' +
+                    '<div class="slider-label-text"><span>Basemap Opacity</span><span id="unified-bm-display" class="active-value">100%</span></div>' +
+                    '<div class="slider-wrapper">' +
+                        '<input type="range" min="0" max="1" step="0.1" value="1.0" class="custom-slider opacity-slider" id="unified-bm-slider" style="--track-color: #007bff; --track-light: #cce5ff; --value: 100%;">' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+            
+        var googleLabel = 'Google Earth' + unifiedBMOpacityUI;
 
         var overlaysTree = [
             // Header for Drought
@@ -433,7 +444,7 @@
         });
         lay.addTo(map);
 
-        // --- NEW LEGEND CONTROL IMPLEMENTATION ---
+        // --- NEW LEGEND CONTROL IMPLEMENTATION (With Accordion Logic) ---
         var legendControl = L.control({ position: 'bottomright' });
 
         legendControl.onAdd = function (map) {
@@ -444,18 +455,26 @@
             `;
             
             var header = div.querySelector('.legend-header');
-            var image = div.querySelector('.legend-image');
-            var icon = div.querySelector('i');
             
             L.DomEvent.disableClickPropagation(div);
             
             header.addEventListener('click', function() {
+                var image = div.querySelector('.legend-image');
+                var icon = div.querySelector('i');
+                var isOpening = image.classList.contains('hidden');
+
                 image.classList.toggle('hidden');
                 header.classList.toggle('header-collapsed');
-                if (image.classList.contains('hidden')) {
-                    icon.className = 'fa fa-caret-up'; 
-                } else {
-                    icon.className = 'fa fa-caret-down'; 
+                icon.className = image.classList.contains('hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
+
+                // Accordion Logic: Close Layers panel when expanding Legend
+                if (isOpening) {
+                    var layerList = document.querySelector('.leaflet-control-layers-list');
+                    var layerIcon = document.querySelector('.layer-control-header i');
+                    if (layerList && !layerList.classList.contains('layer-list-hidden')) {
+                        layerList.classList.add('layer-list-hidden');
+                        if (layerIcon) layerIcon.className = 'fa fa-caret-up';
+                    }
                 }
             });
             
@@ -480,7 +499,6 @@
                 }
             });
         }, 500);
-
 
         /* --- FORCE AGGREGATED MAPS GROUP ALWAYS OPEN & HIDE SUBTITLE INPUTS --- */
         setTimeout(function () {
@@ -514,88 +532,91 @@
             });
 
         }, 600);
-        </script>
 
         setBounds();
-        </script>
         
-        <script>
-            /* --- INJECT HEADER & COLLAPSE LOGIC --- */
-            setTimeout(function() {
-                var controlContainer = document.querySelector('.leaflet-control-layers');
-                var controlList = document.querySelector('.leaflet-control-layers-list');
+        /* --- INJECT HEADER & COLLAPSE LOGIC --- */
+        setTimeout(function() {
+            var controlContainer = document.querySelector('.leaflet-control-layers');
+            var controlList = document.querySelector('.leaflet-control-layers-list');
+            
+            if (controlContainer && controlList) {
+                var headerDiv = document.createElement('div');
+                headerDiv.className = 'layer-control-header';
+                headerDiv.innerHTML = 'Layers&nbsp;&nbsp;<i class="fa fa-caret-down"></i>';
                 
-                if (controlContainer && controlList) {
-                    var headerDiv = document.createElement('div');
-                    headerDiv.className = 'layer-control-header';
-                    headerDiv.innerHTML = 'Layers&nbsp;&nbsp;<i class="fa fa-caret-down"></i>';
+                controlList.parentNode.insertBefore(headerDiv, controlList);
+                
+                headerDiv.addEventListener('click', function() {
+                    var isOpening = controlList.classList.contains('layer-list-hidden');
+                    var icon = headerDiv.querySelector('i');
                     
-                    controlList.parentNode.insertBefore(headerDiv, controlList);
-                    
-                    headerDiv.addEventListener('click', function() {
-                        var icon = headerDiv.querySelector('i');
-                        if (controlList.classList.contains('layer-list-hidden')) {
-                            // Expand
-                            controlList.classList.remove('layer-list-hidden');
-                            headerDiv.classList.remove('header-collapsed');
-                            icon.className = 'fa fa-caret-down';
-                        } else {
-                            // Collapse
-                            controlList.classList.add('layer-list-hidden');
-                            headerDiv.classList.add('header-collapsed');
-                            icon.className = 'fa fa-caret-up';
+                    controlList.classList.toggle('layer-list-hidden');
+                    icon.className = controlList.classList.contains('layer-list-hidden') ? 'fa fa-caret-up' : 'fa fa-caret-down';
+
+                    // Accordion Logic: Close Legend when expanding Layers panel
+                    if (isOpening) {
+                        var legImg = document.querySelector('.legend-image');
+                        var legHdr = document.querySelector('.legend-header');
+                        var legIcon = document.querySelector('.legend-header i');
+                        if (legImg && !legImg.classList.contains('hidden')) {
+                            legImg.classList.add('hidden');
+                            if (legHdr) legHdr.classList.add('header-collapsed');
+                            if (legIcon) legIcon.className = 'fa fa-caret-up';
                         }
-                    });
-                }
-            }, 500);
-
-
-            /* --- SLIDER EVENTS WITH FILL CALCULATION --- */
-            var impactLayers = [
-                layer_365_23_24, layer_365_24_25,
-                layer_HotDry_23, layer_HotDry_24,
-                layer_Wet_23_24, layer_Wet_24_25,
-                layer_ColdDry_24, layer_ColdDry_25
-            ];
-
-            function updateSliderFill(sliderInput) {
-                var value = (sliderInput.value - sliderInput.min) / (sliderInput.max - sliderInput.min) * 100;
-                sliderInput.style.setProperty('--value', value + '%');
-            }
-
-            document.addEventListener('input', function(e) {
-                if (!e.target) return;
-                
-                // Impact Warning Opacity
-                if (e.target.id === 'impact-opacity-slider') {
-                    var val = e.target.value;
-                    document.getElementById('impact-opacity-display').innerText = Math.round(val * 100) + '%';
-                    updateSliderFill(e.target);
-                    
-                    impactLayers.forEach(function(l) {
-                        l.setOpacity(val);
-                    });
-                }
-                
-                // Basemap Opacity
-                if (e.target.classList.contains('opacity-slider')) {
-                    updateSliderFill(e.target);
-                    window[e.target.getAttribute('data-layer')].setOpacity(e.target.value);
-                }
-            });
-
-            /* --- ENSURE NEW LAYERS PICK UP SLIDER OPACITY ON ADD --- */
-            map.on('layeradd', function(e) {
-                if (impactLayers.includes(e.layer)) {
-                    var currentSlider = document.getElementById('impact-opacity-slider');
-                    if (currentSlider) {
-                        e.layer.setOpacity(currentSlider.value);
                     }
-                }
-            });
+                });
+            }
+        }, 500);
 
-            document.addEventListener('mousedown', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
-            document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
+        /* --- SLIDER EVENTS WITH FILL CALCULATION --- */
+        var impactLayers = [
+            layer_365_23_24, layer_365_24_25,
+            layer_HotDry_23, layer_HotDry_24,
+            layer_Wet_23_24, layer_Wet_24_25,
+            layer_ColdDry_24, layer_ColdDry_25
+        ];
+
+        function updateSliderFill(sliderInput) {
+            var value = (sliderInput.value - sliderInput.min) / (sliderInput.max - sliderInput.min) * 100;
+            sliderInput.style.setProperty('--value', value + '%');
+        }
+
+        document.addEventListener('input', function(e) {
+            if (!e.target || !e.target.classList.contains('custom-slider')) return;
+            
+            // Impact Warning Opacity
+            if (e.target.id === 'impact-opacity-slider') {
+                var val = e.target.value;
+                document.getElementById('impact-opacity-display').innerText = Math.round(val * 100) + '%';
+                updateSliderFill(e.target);
+                
+                impactLayers.forEach(function(l) {
+                    l.setOpacity(val);
+                });
+            }
+            
+            // Unified Basemap Opacity
+            if (e.target.id === 'unified-bm-slider') {
+                updateSliderFill(e.target);
+                document.getElementById('unified-bm-display').innerText = Math.round(e.target.value * 100) + '%';
+                layer_GoogleEarth_0.setOpacity(e.target.value);
+                layer_OpenStreetMap_1.setOpacity(e.target.value);
+            }
+        });
+
+        /* --- ENSURE NEW LAYERS PICK UP SLIDER OPACITY ON ADD --- */
+        map.on('layeradd', function(e) {
+            if (impactLayers.includes(e.layer)) {
+                var currentSlider = document.getElementById('impact-opacity-slider');
+                if (currentSlider) {
+                    e.layer.setOpacity(currentSlider.value);
+                }
+            }
+        });
+
+        document.addEventListener('mousedown', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
+        document.addEventListener('click', function(e) { if (e.target.classList.contains('custom-slider')) e.stopPropagation(); });
 
         </script>
     </body>
